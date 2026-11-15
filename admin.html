@@ -1260,6 +1260,44 @@ function render() {
       </div>
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="font-size:13px;">Rekap Bon Harian (Global)</strong>
+          <button style="border:0;background:transparent;color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;" onclick="state.tagihanSubTab='rekap';state.tab='tagihan';render()">Filter & Detail →</button>
+        </div>
+        ${(() => {
+          const list = state.bonSavedList.filter(b => b.tgl === state.ownerRekapTgl);
+          const totKg = list.reduce((s, b) => s + Number(b.kg || 0), 0);
+          const totEkor = list.reduce((s, b) => s + Number(b.ekor || 0), 0);
+          const totRp = list.reduce((s, b) => s + Number(b.total || 0), 0);
+          const map = {};
+          const groups = [];
+          list.forEach(b => {
+            if (!map[b.pedagang]) { map[b.pedagang] = { pedagang: b.pedagang, rows: [], totEkor: 0, totKg: 0, totRp: 0, allLunas: true }; groups.push(map[b.pedagang]); }
+            map[b.pedagang].rows.push(b);
+            map[b.pedagang].totEkor += Number(b.ekor || 0);
+            map[b.pedagang].totKg += Number(b.kg || 0);
+            map[b.pedagang].totRp += Number(b.total || 0);
+            if (b.status !== 'Lunas') map[b.pedagang].allLunas = false;
+          });
+          return `
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;margin-bottom:8px;font-size:11.5px;font-weight:700;color:var(--navy);">
+              ${list.length} entri · ${totKg.toLocaleString('id-ID')} kg · ${totEkor} ekr · ${rp(totRp)}
+            </div>
+            ${groups.map(g => `
+              <div style="font-size:11.5px;padding:5px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <strong>${g.pedagang}</strong> <span style="color:var(--muted);">(${g.rows.length > 1 ? g.rows.length + ' entri · ' : ''}${g.totKg} kg · ${g.totEkor} ekr)</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <strong>${rp(g.totRp)}</strong>
+                  <span class="badge ${g.allLunas?'b-green':'b-amber'}" style="padding:1px 6px;font-size:9.5px;">${g.allLunas?'Lunas':'Belum'}</span>
+                </div>
+              </div>
+            `).join('') || '<div style="font-size:11px;color:var(--muted);">Belum ada bon hari ini.</div>'}
+          `;
+        })()}
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <strong style="font-size:13px;">Pengeluaran (${state.ownerTimeline})</strong>
           <strong style="font-size:13px;color:var(--red);">${rp(tl.biaya)}</strong>
         </div>
