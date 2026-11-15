@@ -477,6 +477,8 @@ const state = {
   belumBayarSubTab: 'bon', // bon | nyenteng
   ownerTagihSearch: '',
   ownerExpandedBonId: null,
+  ownerRekapTgl: '2026-11-15',
+  ownerRekapShift: 'Semua', // Semua | MALAM | SIANG
   ownerTimeline: 'Harian', // Harian | Mingguan | Bulanan
   kandangSubTab: 'hidup', // hidup | freezer
   partingItem: 'Dada (DD)',
@@ -2083,13 +2085,88 @@ function render() {
   if (state.tab === 'tagihan') {
     const belumBons = state.bonSavedList.map((b, i) => ({ b, i })).filter(x => x.b.status === 'Belum Bayar');
     c.innerHTML = `
-      <h2>Keuangan & Penagihan Owner</h2>
+      <h2>Keuangan & Rekap Owner</h2>
       <div class="seg">
-        <button class="${state.tagihanSubTab==='bon'?'on':''}" onclick="state.tagihanSubTab='bon';render()">Tagih Bon (${belumBons.length})</button>
-        <button class="${state.tagihanSubTab==='pt'?'on':''}" onclick="state.tagihanSubTab='pt';render()">Tagihan Supplier & Diskon</button>
+        <button class="${state.tagihanSubTab==='rekap'?'on':''}" onclick="state.tagihanSubTab='rekap';render()">Rekap Bon</button>
+        <button class="${state.tagihanSubTab==='bon'?'on':''}" onclick="state.tagihanSubTab='bon';render()">Tagih (${belumBons.length})</button>
+        <button class="${state.tagihanSubTab==='pt'?'on':''}" onclick="state.tagihanSubTab='pt';render()">Supplier</button>
       </div>
 
-      ${state.tagihanSubTab === 'bon' ? `
+      ${state.tagihanSubTab === 'rekap' ? (() => {
+        const list = state.bonSavedList.filter(b =>
+          (!state.ownerRekapTgl || b.tgl === state.ownerRekapTgl) &&
+          (state.ownerRekapShift === 'Semua' || b.shift === state.ownerRekapShift)
+        );
+        const totKg = list.reduce((s, b) => s + Number(b.kg || 0), 0);
+        const totEkor = list.reduce((s, b) => s + Number(b.ekor || 0), 0);
+        const totRp = list.reduce((s, b) => s + Number(b.total || 0), 0);
+        const groups = [];
+        const map = {};
+        list.forEach((b, idx) => {
+          if (!map[b.pedagang]) {
+            map[b.pedagang] = { pedagang: b.pedagang, rows: [], totEkor: 0, totRp: 0 };
+            groups.push(map[b.pedagang]);
+          }
+          map[b.pedagang].rows.push(b);
+          map[b.pedagang].totEkor += Number(b.ekor || 0);
+          map[b.pedagang].totRp += Number(b.total || 0);
+        });
+        return `
+          <div class="card" style="padding:10px 12px;margin-bottom:10px;">
+            <div class="row" style="align-items:center;margin-bottom:8px;">
+              <input type="date" value="${state.ownerRekapTgl}" onchange="state.ownerRekapTgl=this.value;render()" style="margin:0;padding:6px 8px;font-size:12px;" />
+              <div style="display:flex;gap:4px;">
+                ${['Semua','MALAM','SIANG'].map(sh => `
+                  <button class="chip ${state.ownerRekapShift===sh?'on':''}" style="padding:5px 9px;font-size:11px;" onclick="state.ownerRekapShift='${sh}';render()">${sh}</button>
+                `).join('')}
+              </div>
+            </div>
+            <div style="background:var(--navy);color:#fff;border-radius:10px;padding:10px 12px;">
+              <div style="font-size:10.5px;color:var(--subtle);">REKAPAN TGL ${state.ownerRekapTgl} (${state.ownerRekapShift})</div>
+              <div style="font-size:13px;font-weight:800;margin-top:3px;">${list.length} entri · ${totKg.toLocaleString('id-ID')} kg · ${totEkor} ekr · ${rp(totRp)}</div>
+            </div>
+          </div>
+          <div class="card" style="padding:10px 12px;">
+            ${groups.map((g, gIdx) => `
+              <div style="${gIdx > 0 ? 'border-top:1px solid var(--border);margin-top:8px;padding-top:8px;' : ''}">
+                ${g.rows.length > 1 ? `
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <div><strong style="font-size:13px;">${g.pedagang}</strong> <span style="font-size:11px;color:var(--muted);">${g.rows.length} entri · ${g.totEkor} ekr</span></div>
+                    <strong style="font-size:13px;color:var(--navy);">${rp(g.totRp)}</strong>
+                  </div>
+                  ${g.rows.map(b => `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0 4px 10px;border-top:1px dashed var(--border);font-size:11.5px;">
+                      <div style="color:var(--muted);">
+                        — <strong style="color:var(--text);">${b.kg} kg</strong> · ${b.ekor} ekr · @${(b.harga/1000).toFixed(1).replace('.0','')}rb
+                        <span class="badge ${b.jalur==='OB'?'b-blue':'b-green'}" style="padding:1px 5px;font-size:9px;">${b.jalur||'TU'}</span>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:6px;">
+                        <strong>${rp(b.total)}</strong>
+                        <span class="badge ${b.status==='Lunas'?'b-green':'b-amber'}" style="padding:1px 6px;font-size:9.5px;">${b.status}</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                ` : (() => {
+                  const b = g.rows[0];
+                  return `
+                    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+                      <div>
+                        <strong>${b.pedagang}</strong>
+                        <span class="badge ${b.jalur==='OB'?'b-blue':'b-green'}" style="padding:1px 5px;font-size:9px;margin-left:3px;">${b.jalur||'TU'}</span>
+                        <div style="font-size:11px;color:var(--muted);">${b.kg} kg · ${b.ekor} ekr · @${(b.harga/1000).toFixed(1).replace('.0','')}rb</div>
+                      </div>
+                      <div style="text-align:right;">
+                        <strong style="display:block;">${rp(b.total)}</strong>
+                        <span class="badge ${b.status==='Lunas'?'b-green':'b-amber'}" style="padding:1px 6px;font-size:9.5px;">${b.status}</span>
+                      </div>
+                    </div>
+                  `;
+                })()}
+              </div>
+            `).join('') || '<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px;">Belum ada entri bon pada tanggal ini.</div>'}
+          </div>
+        `;
+      })() : state.tagihanSubTab === 'bon' ? `
         <div class="card" style="background:var(--navy);color:#fff;padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:11px;color:var(--subtle);">Uang Masuk Penagihan:</span>
           <strong style="font-size:16px;color:#4ADE80;">${rp(state.uangMasukPelunasan)}</strong>
