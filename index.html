@@ -336,10 +336,11 @@
 </div>
 
 <script>
+const LOCKED = window.LOCKED_ROLE || new URLSearchParams(location.search).get('role') || '';
 const state = {
-  role: 'login', // login | owner | admin | lapak
-  tab: 'home',
-  selectedLoginArea: 'admin',
+  role: LOCKED || 'login', // login | owner | admin | lapak
+  tab: LOCKED === 'admin' ? 'pt' : (LOCKED === 'lapak' ? 'lapak' : 'home'),
+  selectedLoginArea: LOCKED || 'admin',
   pin: '',
   // Data simulasi operasional
   ptModalFuso: 21500,
@@ -1064,7 +1065,15 @@ function renderNav() {
 }
 
 function render() {
+  const tb = document.querySelector('.toolbar');
+  if (tb && (LOCKED === 'admin' || LOCKED === 'lapak')) {
+    tb.style.display = 'none';
+  }
   const pill = document.getElementById('headerRole');
+  if (pill && (LOCKED === 'admin' || LOCKED === 'lapak')) {
+    pill.onclick = null;
+    pill.style.cursor = 'default';
+  }
   const pillMap = {
     login: ['Login APK', 'b-gray'],
     owner: ['Owner Only', 'b-blue'],

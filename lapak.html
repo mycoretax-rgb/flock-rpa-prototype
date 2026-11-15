@@ -1,0 +1,2078 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>flock. · Al-Amin Barokah (Prototype Interaktif)</title>
+  <style>
+    :root {
+      --navy: #0F172A;
+      --navy-light: #1E293B;
+      --blue: #2563EB;
+      --blue-soft: #EFF6FF;
+      --blue-border: #BFDBFE;
+      --bg: #F8FAFC;
+      --white: #FFFFFF;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --muted: #64748B;
+      --subtle: #94A3B8;
+      --green: #16A34A;
+      --green-soft: #DCFCE7;
+      --amber: #D97706;
+      --amber-soft: #FEF3C7;
+      --red: #DC2626;
+      --red-soft: #FEE2E2;
+      --purple: #7C3AED;
+      --purple-soft: #F3E8FF;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #E2E8F0;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.38;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px 12px 32px;
+    }
+    .content::-webkit-scrollbar { width: 4px; }
+    .content::-webkit-scrollbar-track { background: transparent; }
+    .content::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    input:focus, select:focus { outline: 2px solid var(--blue); border-color: var(--blue); background: #fff; }
+    .toolbar {
+      width: 100%;
+      max-width: 420px;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+    }
+    .toolbar select, .toolbar button {
+      background: var(--navy-light);
+      color: var(--white);
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .phone {
+      width: 100%;
+      max-width: 390px;
+      height: 820px;
+      background: var(--bg);
+      border-radius: 32px;
+      border: 6px solid #1E293B;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 50px rgba(15, 23, 42, 0.25);
+      position: relative;
+    }
+    .header {
+      background: var(--navy);
+      color: var(--white);
+      padding: 14px 20px 16px;
+      flex-shrink: 0;
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .sync { color: #4ADE80; }
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand { font-size: 21px; font-weight: 800; letter-spacing: -0.5px; }
+    .sub-brand { font-size: 12px; color: var(--subtle); margin-top: 2px; }
+    .role-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 18px 20px;
+    }
+    .nav {
+      height: 68px;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-shrink: 0;
+    }
+    .nav button {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      position: relative;
+    }
+    .nav button.active { color: var(--blue); }
+    .nav button.active::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 34px;
+      height: 3px;
+      background: var(--blue);
+      border-radius: 2px;
+    }
+    .nav .ico { font-size: 16px; }
+    h2 { margin: 0 0 12px; font-size: 16.5px; font-weight: 800; letter-spacing: -0.02em; display: flex; justify-content: space-between; align-items: center; }
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 13px 14px;
+      margin-bottom: 10px;
+    }
+    .card-dark {
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .kpi {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .kpi .lbl { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .kpi .val { font-size: 18px; font-weight: 800; margin: 4px 0 2px; }
+    .kpi .sub { font-size: 10.5px; font-weight: 600; }
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+    .b-blue { background: var(--blue-soft); color: var(--blue); }
+    .b-green { background: var(--green-soft); color: var(--green); }
+    .b-amber { background: var(--amber-soft); color: var(--amber); }
+    .b-red { background: var(--red-soft); color: var(--red); }
+    .b-purple { background: var(--purple-soft); color: var(--purple); }
+    .b-gray { background: #F1F5F9; color: var(--muted); }
+    label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: 0;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.06s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-blue { background: var(--blue); color: var(--white); }
+    .btn-navy { background: var(--navy); color: var(--white); }
+    .btn-green { background: var(--green); color: var(--white); }
+    .btn-amber { background: var(--amber-soft); color: var(--amber); border: 1px solid #FDE68A; }
+    .btn-red { background: var(--red-soft); color: var(--red); }
+    .btn-soft { background: var(--blue-soft); color: var(--blue); }
+    .row { display: flex; gap: 8px; align-items: center; }
+    .row > * { flex: 1; }
+    .seg {
+      display: flex;
+      background: var(--border);
+      padding: 3px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .seg button {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      padding: 7px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .seg button.on { background: var(--white); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .area-btn {
+      width: 100%;
+      text-align: left;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .area-btn.selected {
+      background: var(--blue-soft);
+      border-color: var(--blue);
+    }
+    .area-btn .t { font-size: 14px; font-weight: 800; }
+    .area-btn .d { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+    .pin-dots { display: flex; justify-content: center; gap: 14px; margin: 12px 0 16px; }
+    .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--blue); }
+    .dot.fill { background: var(--blue); }
+    .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .numpad button {
+      padding: 13px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .toast {
+      position: absolute;
+      bottom: 82px;
+      left: 16px;
+      right: 16px;
+      background: var(--navy);
+      color: var(--white);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 20;
+    }
+    .toast.show { opacity: 1; }
+    .chip {
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .chip.on { background: var(--blue-soft); color: var(--blue); border-color: var(--blue-border); }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span><strong>Prototype:</strong> flock. · Al-Amin Barokah</span>
+  <div style="display:flex;gap:6px;">
+    <select id="roleJump" onchange="switchRole(this.value)">
+      <option value="login">01 · Login PIN</option>
+      <option value="owner">Role: OWNER</option>
+      <option value="admin">Role: ADMIN</option>
+      <option value="lapak">Role: KASIR LAPAK</option>
+    </select>
+    <button onclick="switchRole('login')">Reset</button>
+  </div>
+</div>
+
+<div class="phone">
+  <div class="header">
+    <div class="status-row">
+      <span>9:41</span>
+      <span class="sync">● Terhubung (SaaS Live)</span>
+    </div>
+    <div class="brand-row">
+      <div>
+        <div class="brand">flock.</div>
+        <div class="sub-brand">Al-Amin Barokah</div>
+      </div>
+      <div style="text-align:right">
+        <span class="role-pill b-blue" id="headerRole" onclick="switchRole('login')">Login APK</span>
+        <div style="font-size:11px;color:var(--subtle);margin-top:4px;">15 Nov 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="appContent"></div>
+
+  <div class="nav" id="bottomNav" style="display:none;"></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>window.LOCKED_ROLE = "lapak";</script>
+<script>
+const LOCKED = window.LOCKED_ROLE || new URLSearchParams(location.search).get('role') || '';
+const state = {
+  role: LOCKED || 'login', // login | owner | admin | lapak
+  tab: LOCKED === 'admin' ? 'pt' : (LOCKED === 'lapak' ? 'lapak' : 'home'),
+  selectedLoginArea: LOCKED || 'admin',
+  pin: '',
+  // Data simulasi operasional
+  ptModalFuso: 21500,
+  ptModalL300: 22200,
+  ptKgFuso: 2718.0,
+  ptKgL300: 1417.4,
+  ptBeliTanggal: '2026-11-15',
+  ptPurchaseHistory: [
+    { tgl: '2026-11-15', fusoKg: 2718.0, fusoHarga: 21500, l300Kg: 1417.4, l300Harga: 22200, total: 89903280, lunas: false },
+    { tgl: '2026-11-14', fusoKg: 2540.0, fusoHarga: 21300, l300Kg: 1320.0, l300Harga: 22000, total: 83142000, lunas: true }
+  ],
+  ptForm: {
+    ptName: 'PT. Sido Mukti Mandiri',
+    noDo: '000103',
+    lokasi: 'CJR 1 Kd. 7',
+    armada: 'FUSO',
+    kepada: 'H. Yana / Dede',
+    totalEkor: '1280',
+    totalBerat: '2718.0',
+    obEkor: '830',
+    doa: '4',
+    fotoName: '',
+    fotoUrl: ''
+  },
+  ptSavedList: [
+    { ptName: 'PT. Rismawan Pratama', noDo: '001210', armada: 'L300', lokasi: 'Cicadas', kepada: 'Yana', totalEkor: 1100, totalBerat: 2276.8, obEkor: 700, tuEkor: 398, doa: 2, jam: '05:40 WIB', fotoName: 'dokumen-l300.jpg', fotoUrl: '' }
+  ],
+  ptEditingIdx: null,
+  previewFoto: null,
+  ptTotalEkor: 1280,
+  ptObEkor: 830,
+  ptObKg: 1762,
+  ptTuEkor: 446,
+  ptTuKg: 947.5,
+  ptDoa: 4,
+  kandangAwal: 120,
+  kandangKeluar: 380,
+  kandangMati: 5,
+  lapakBuyerType: 'Pembeli Biasa',
+  lapakBorrowerName: '',
+  lapakItemName: 'Ayam (Ay)',
+  lapakItems: [
+    { id: 'Ayam (Ay)', short: 'Ayam', code: 'AY', sat: 'kg' },
+    { id: 'Ati (AT)', short: 'Ati', code: 'AT', sat: 'pcs' },
+    { id: 'Kaki (KK)', short: 'Kaki', code: 'KK', sat: 'kg' },
+    { id: 'Sayap (SY)', short: 'Sayap', code: 'SY', sat: 'kg' },
+    { id: 'Kepala (Kpl)', short: 'Kepala', code: 'KPL', sat: 'kg' },
+    { id: 'Dada (DD)', short: 'Dada', code: 'DD', sat: 'kg' },
+    { id: 'Tulang (TL)', short: 'Tulang', code: 'TL', sat: 'kg' },
+    { id: 'Fillet', short: 'Fillet', code: 'FLT', sat: 'kg' }
+  ],
+  showAddItem: false,
+  newItemName: '',
+  newItemSat: 'kg',
+  lapakNote: '',
+  lapakKg: 12.5,
+  lapakHarga: 34000,
+  lapakCart: [
+    { barang: 'Ayam (Ay)', qty: 2, satuan: 'kg', harga: 34000, total: 68000 },
+    { barang: 'Ati (AT)', qty: 10, satuan: 'pcs', harga: 2500, total: 25000 }
+  ],
+  lapakHistory: [
+    { jam: '08:15', nama: 'Pembeli Biasa', detail: 'Ayam (Ay) · 2 kg', total: 68000, status: 'Lunas' },
+    { jam: '08:02', nama: 'Gugun', detail: 'Ayam (Ay) · 3 kg', total: 0, status: 'Nyenteng' },
+    { jam: '07:45', nama: 'Encep', detail: 'Sayap (SY) · 7 kg', total: 0, status: 'Nyenteng' }
+  ],
+  nyentengList: [
+    {
+      id: 'PJM-01',
+      nama: 'Gugun',
+      tglAmbil: '14 Nov (Kemarin · 1 hr)',
+      tipe: 'Nyenteng',
+      items: [
+        { barang: 'Ayam (Ay)', riwayat: '20+3', satuan: 'kg', qty: 23, harga: 33000 },
+        { barang: 'Ati (AT)', riwayat: '20', satuan: 'pcs', qty: 20, harga: 2500 },
+        { barang: 'Kaki (KK)', riwayat: '2', satuan: 'kg', qty: 2, harga: 20000 }
+      ],
+      catatan: '',
+      totalTagihan: 849000,
+      sudahBayar: 0,
+      bayarInput: 849000,
+      metode: 'Tunai'
+    },
+    {
+      id: 'PJM-02',
+      nama: 'Encep',
+      tglAmbil: '15 Nov (Hari ini)',
+      tipe: 'Nyenteng',
+      items: [
+        { barang: 'Sayap (SY)', riwayat: '7', satuan: 'kg', qty: 7, harga: 0 },
+        { barang: 'Kaki (KK)', riwayat: '5', satuan: 'kg', qty: 5, harga: 0 },
+        { barang: 'Ati (AT)', riwayat: '50', satuan: 'pcs', qty: 50, harga: 0 }
+      ],
+      catatan: 'Harga nyusul',
+      totalTagihan: 0,
+      sudahBayar: 0,
+      bayarInput: 0,
+      metode: 'Tunai'
+    }
+  ],
+  lapakSubTab: 'pos', // pos | parting
+  tagihanSubTab: 'bon', // bon | pt
+  bonTagihan: 1056400,
+  bonBayar: 1056000,
+  bonLunas: false,
+  totalDiskonBulan: 185400,
+  totalBonDiskon: 42,
+  pengeluaran: [
+    { no: '#014', ket: 'Es Batu Balok (2 bal)', jam: '06:15', sumber: 'Kas Lapak', rp: 75000, st: 'Disetujui' },
+    { no: '#015', ket: 'Plastik & Kresek 2 kg', jam: '08:40', sumber: 'Kas Lapak', rp: 45000, st: 'Menunggu' },
+  ],
+  shift: 'MALAM',
+  pedagangSearch: '',
+  pedagangList: ['Indra','Ina','Aa','Encep','Dasep','Andri bebek','Anggun','Rudi','Alesa','Ule','Maul','Mang Ayi','Said','Uloh','Bu Hj','Rijal','Bu Ani','Iki','Nandi','Dori','Yanto','Idan','Aceng'],
+  showAddPedagang: false,
+  newPedagangName: '',
+  pedagangSelected: 'Nandi',
+  pedagangDone: ['Indra', 'Bu Hj', 'Maul'],
+  bonKg: '32',
+  bonEkor: '15',
+  bonHarga: '33000',
+  bonNote: '',
+  bonEntriesCount: 17,
+  bonEntriesKg: 2385.55,
+  bonEntriesEkor: 1060,
+  bonEntriesRp: 56973825,
+  bonTanggal: '2026-11-15',
+  bonSavedList: [
+    { id: 'BON-101', tgl: '2026-11-15', shift: 'MALAM', pedagang: 'Indra', kg: 45.2, ekor: 22, harga: 33000, total: 1491600, sudahBayar: 0, bayarInput: 1491000, metode: 'Tunai', note: 'bon 2 lembar', status: 'Belum Bayar' },
+    { id: 'BON-102', tgl: '2026-11-15', shift: 'MALAM', pedagang: 'Bu Hj', kg: 38.0, ekor: 18, harga: 33000, total: 1254000, sudahBayar: 0, bayarInput: 1254000, metode: 'Transfer', note: 'DG 33', status: 'Belum Bayar' },
+    { id: 'BON-100', tgl: '2026-11-15', shift: 'MALAM', pedagang: 'Maul', kg: 53.1, ekor: 25, harga: 33000, total: 1752300, sudahBayar: 1752300, bayarInput: 0, metode: 'Tunai', note: '', status: 'Lunas' }
+  ],
+  belumBayarSubTab: 'bon', // bon | nyenteng
+  ownerTagihSearch: '',
+  ownerExpandedBonId: null,
+  ownerTimeline: 'Harian', // Harian | Mingguan | Bulanan
+  kandangSubTab: 'hidup', // hidup | freezer
+  partingItem: 'Dada (DD)',
+  partingKtg: '',
+  partingKg: '',
+  partingCart: [],
+  partingTodayLog: [],
+  showSaldoAwalFreezer: false,
+  showKeluarFreezer: false,
+  saldoAwalItem: 'Dada (DD)',
+  saldoAwalKtg: '',
+  saldoAwalKg: '',
+  freezerKeluarLog: [
+    { item: 'Dada (DD)', ktg: 2, kg: 4.0, jam: '01:30 WIB', ket: 'Pengiriman pertama ke Lapak' }
+  ],
+  kandangPengeluaran: [
+    { ket: 'Bensin Mobil Pick Up', rp: 150000, sumber: 'Kas Kandang', jam: '04:15 WIB' },
+    { ket: 'Uang Jalan Sopir', rp: 100000, sumber: 'Kas Kandang', jam: '04:20 WIB' },
+    { ket: 'Pembayaran Usus', rp: 85000, sumber: 'Kas Kandang', jam: '06:10 WIB' }
+  ],
+  kdExpKet: '',
+  kdExpRp: '',
+  freezerStock: [
+    { item: 'Dada (DD)', kantong: 3, kgSistem: 6.2, kgAktual: 6.2, umur: 'Kemarin (1 hr)' },
+    { item: 'Paha (PH)', kantong: 4, kgSistem: 7.0, kgAktual: 6.8, umur: 'Kemarin (1 hr)' },
+    { item: 'Sayap (SY)', kantong: 2, kgSistem: 3.0, kgAktual: 3.0, umur: 'Hari ini' },
+    { item: 'Fillet', kantong: 9, kgSistem: 9.0, kgAktual: 9.0, umur: 'Hari ini' }
+  ],
+  uangMasukPelunasan: 1752300,
+  absenList: [
+    { nama: 'Mang Ujang', bagian: 'Kandang', jam: '05:30' },
+    { nama: 'Kang Asep', bagian: 'Pemotong', jam: '02:00' },
+    { nama: 'Dedi', bagian: 'Pemotong', jam: '02:05' }
+  ],
+  absenNama: '',
+  absenBagian: 'Pemotong',
+  stokShift: 'Malam (Kahfi)',
+  stokInputVal: '',
+  stokLog: [
+    { shift: 'Malam (Kahfi)', ekor: 629, jam: '22:15 WIB', status: 'Sesuai' },
+    { shift: 'Siang (Budi)', ekor: 120, jam: '13:40 WIB', status: 'Sesuai' }
+  ]
+};
+
+const rp = (n) => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function switchRole(r) {
+  state.role = r;
+  state.pin = '';
+  document.getElementById('roleJump').value = r;
+  if (r === 'owner') state.tab = 'home';
+  if (r === 'admin') state.tab = 'pt';
+  if (r === 'lapak') state.tab = 'lapak';
+  render();
+}
+
+function saveHargaBeliPt() {
+  const fHarga = Number(document.getElementById('inFusoKeu').value || 0);
+  const lHarga = Number(document.getElementById('inL300Keu').value || 0);
+  state.ptModalFuso = fHarga;
+  state.ptModalL300 = lHarga;
+  const tot = Math.round((state.ptKgFuso * fHarga) + (state.ptKgL300 * lHarga));
+  const existing = state.ptPurchaseHistory.find(p => p.tgl === state.ptBeliTanggal);
+  if (existing) {
+    existing.fusoHarga = fHarga;
+    existing.l300Harga = lHarga;
+    existing.total = tot;
+  } else {
+    state.ptPurchaseHistory.unshift({
+      tgl: state.ptBeliTanggal,
+      fusoKg: state.ptKgFuso,
+      fusoHarga: fHarga,
+      l300Kg: state.ptKgL300,
+      l300Harga: lHarga,
+      total: tot,
+      lunas: false
+    });
+  }
+  toast('✓ Pembelian tgl ' + state.ptBeliTanggal + ' (' + rp(tot) + ') tersimpan!');
+  render();
+}
+
+function addKandangExp() {
+  const ket = (state.kdExpKet || '').trim();
+  const rpVal = Number(state.kdExpRp || 0);
+  if (!ket || !rpVal) { toast('Isi Keperluan & Nominal dulu!'); return; }
+  const now = new Date();
+  const jam = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ' WIB';
+  state.kandangPengeluaran.unshift({ ket, rp: rpVal, sumber: 'Kas Kandang', jam });
+  state.kdExpKet = '';
+  state.kdExpRp = '';
+  toast('✓ Pengeluaran kandang (' + ket + ') tersimpan!');
+  render();
+}
+
+function keluarFreezerMalam() {
+  const ktg = Number(state.saldoAwalKtg || 0);
+  const kg = Number(state.saldoAwalKg || 0);
+  if (!ktg || !kg) { toast('Isi jumlah Kantong & Kg dulu!'); return; }
+  const existing = state.freezerStock.find(x => x.item === state.saldoAwalItem);
+  if (existing) {
+    existing.kantong = Math.max(0, existing.kantong - ktg);
+    existing.kgSistem = Math.max(0, Number((existing.kgSistem - kg).toFixed(1)));
+    existing.kgAktual = existing.kgSistem;
+  }
+  const now = new Date();
+  const jam = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ' WIB';
+  state.freezerKeluarLog.unshift({ item: state.saldoAwalItem, ktg, kg, jam, ket: 'Kirim ke Lapak' });
+  state.saldoAwalKtg = '';
+  state.saldoAwalKg = '';
+  state.showKeluarFreezer = false;
+  toast('✓ Keluar ke Lapak (' + kg + ' kg) dicatat & mengurangi stok Freezer!');
+  render();
+}
+
+function addSaldoAwalFreezer() {
+  const ktg = Number(state.saldoAwalKtg || 0);
+  const kg = Number(state.saldoAwalKg || 0);
+  if (!ktg || !kg) { toast('Isi jumlah Kantong & Kg dulu!'); return; }
+  const existing = state.freezerStock.find(x => x.item === state.saldoAwalItem);
+  if (existing) {
+    existing.kantong += ktg;
+    existing.kgSistem = Number((existing.kgSistem + kg).toFixed(1));
+    existing.kgAktual = existing.kgSistem;
+    existing.umur = 'Saldo Awal';
+  } else {
+    state.freezerStock.unshift({ item: state.saldoAwalItem, kantong: ktg, kgSistem: kg, kgAktual: kg, umur: 'Saldo Awal' });
+  }
+  state.saldoAwalKtg = '';
+  state.saldoAwalKg = '';
+  state.showSaldoAwalFreezer = false;
+  toast('✓ Saldo awal ' + state.saldoAwalItem + ' (' + kg + ' kg) masuk & tampil di Owner!');
+  render();
+}
+
+function addPartingCart() {
+  const ktg = Number(state.partingKtg || 0);
+  const kg = Number(state.partingKg || 0);
+  if (!ktg || !kg) { toast('Isi Kantong & Berat (kg) dulu!'); return; }
+  state.partingCart.push({ item: state.partingItem, ktg, kg });
+  state.partingKtg = '';
+  state.partingKg = '';
+  toast('+ ' + state.partingItem + ' masuk list parting!');
+  render();
+}
+
+function savePartingCart(arah = 'masuk') {
+  if (!state.partingCart.length) { toast('List barang masih kosong!'); return; }
+  const now = new Date();
+  const jam = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+  for (const pt of state.partingCart) {
+    const existing = state.freezerStock.find(x => x.item === pt.item);
+    if (arah === 'masuk') {
+      if (existing) {
+        existing.kantong += pt.ktg;
+        existing.kgSistem = Number((existing.kgSistem + pt.kg).toFixed(1));
+        existing.kgAktual = existing.kgSistem;
+      } else {
+        state.freezerStock.unshift({ item: pt.item, kantong: pt.ktg, kgSistem: pt.kg, kgAktual: pt.kg, umur: 'Hari ini' });
+      }
+    } else {
+      if (existing) {
+        existing.kantong = Math.max(0, existing.kantong - pt.ktg);
+        existing.kgSistem = Math.max(0, Number((existing.kgSistem - pt.kg).toFixed(1)));
+        existing.kgAktual = existing.kgSistem;
+      }
+    }
+    state.partingTodayLog.unshift({ item: pt.item, ktg: pt.ktg, kg: pt.kg, jam, arah });
+  }
+  state.partingCart = [];
+  toast(arah === 'masuk' ? '✓ Masuk Freezer (+) tercatat!' : '✓ Keluar Stok Lama (−) tercatat!');
+  render();
+}
+
+function addNewPedagang() {
+  const nm = (state.newPedagangName || '').trim();
+  if (!nm) { toast('Ketik nama pedagang dulu!'); return; }
+  if (!state.pedagangList.some(x => x.toLowerCase() === nm.toLowerCase())) {
+    state.pedagangList.unshift(nm);
+  }
+  state.pedagangSelected = nm;
+  state.pedagangSearch = '';
+  state.newPedagangName = '';
+  state.showAddPedagang = false;
+  toast('✓ Pedagang "' + nm + '" ditambahkan & dipilih!');
+  render();
+}
+
+function addNewLapakItem() {
+  const nm = (state.newItemName || '').trim();
+  if (!nm) { toast('Isi nama item baru dulu!'); return; }
+  state.lapakItems.push({ id: nm, short: nm, code: nm.slice(0,3).toUpperCase(), sat: state.newItemSat });
+  state.lapakItemName = nm;
+  state.newItemName = '';
+  state.showAddItem = false;
+  toast('✓ Item "' + nm + '" ditambahkan!');
+  render();
+}
+
+function addToPosCart() {
+  const qty = Number(state.lapakKg || 0);
+  const harga = Number(state.lapakHarga || 0);
+  if (!qty) { toast('Isi Qty / Berat dulu!'); return; }
+  const cur = state.lapakItems.find(x => x.id === state.lapakItemName) || { sat: 'kg' };
+  state.lapakCart.push({
+    barang: state.lapakItemName,
+    qty,
+    satuan: cur.sat,
+    harga,
+    total: Math.round(qty * harga)
+  });
+  toast('+ ' + state.lapakItemName + ' masuk struk!');
+  render();
+}
+
+function updateNyItemHarga(nIdx, iIdx, val) {
+  const n = state.nyentengList[nIdx];
+  n.items[iIdx].harga = Number(val || 0);
+  const tot = n.items.reduce((s, it) => s + Math.round(it.qty * Number(it.harga || 0)), 0);
+  n.totalTagihan = tot;
+  n.bayarInput = Math.max(0, tot - Number(n.sudahBayar || 0));
+  render();
+}
+
+function cicilNyenteng(idx) {
+  const n = state.nyentengList[idx];
+  const bayar = Number(n.bayarInput || 0);
+  if (!bayar) { toast('Isi nominal bayar dulu!'); return; }
+  n.sudahBayar = Number(n.sudahBayar || 0) + bayar;
+  state.uangMasukPelunasan += bayar;
+  const sisa = Math.max(0, Number(n.totalTagihan || 0) - n.sudahBayar);
+  n.bayarInput = sisa;
+  toast('✓ Cicilan ' + rp(bayar) + ' masuk! Sisa tagihan ' + n.nama + ': ' + rp(sisa));
+  render();
+}
+
+function checkoutPos(mode) {
+  if (!state.lapakCart.length) { toast('Struk masih kosong!'); return; }
+  const grandTotal = state.lapakCart.reduce((s, it) => s + it.total, 0);
+  const detail = state.lapakCart.map(it => it.barang.split(' ')[0] + ' ' + it.qty + it.satuan).join(', ');
+  const now = new Date();
+  const jam = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+  const nama = (state.lapakBorrowerName || '').trim() || (mode === 'Lunas' ? 'Pembeli Biasa' : 'Pelanggan Lapak');
+
+  state.lapakHistory.unshift({ jam, nama, detail, total: mode === 'Nyenteng' ? 0 : grandTotal, status: mode });
+
+  if (mode === 'Lunas') {
+    state.uangMasukPelunasan += grandTotal;
+    toast('✓ Struk Lunas ' + rp(grandTotal) + ' masuk kas!');
+  } else {
+    const existing = state.nyentengList.find(x => x.nama.toLowerCase() === nama.toLowerCase());
+    if (existing) {
+      for (const cItem of state.lapakCart) {
+        const it = existing.items.find(i => i.barang === cItem.barang);
+        if (it) { it.riwayat += '+' + cItem.qty; it.qty += cItem.qty; }
+        else { existing.items.push({ barang: cItem.barang, riwayat: String(cItem.qty), satuan: cItem.satuan, qty: cItem.qty, harga: 0 }); }
+      }
+      if (mode !== 'Nyenteng') {
+        existing.totalTagihan += grandTotal;
+        existing.bayarInput = existing.totalTagihan;
+      }
+    } else {
+      state.nyentengList.unshift({
+        id: 'PJM-0' + (state.nyentengList.length + 1),
+        nama,
+        tglAmbil: '15 Nov (Hari ini)',
+        tipe: 'Nyenteng',
+        items: state.lapakCart.map(cItem => ({ barang: cItem.barang, riwayat: String(cItem.qty), satuan: cItem.satuan, qty: cItem.qty, harga: 0 })),
+        catatan: '',
+        totalTagihan: mode === 'Nyenteng' ? 0 : grandTotal,
+        sudahBayar: 0,
+        bayarInput: mode === 'Nyenteng' ? 0 : grandTotal,
+        metode: 'Tunai'
+      });
+    }
+    toast('✓ Struk masuk ' + mode + ' (' + nama + ')!');
+  }
+  state.lapakCart = [];
+  state.lapakBorrowerName = '';
+  render();
+}
+
+function addLapakLunas(est) {
+  const nama = (state.lapakBorrowerName || '').trim() || 'Pembeli Biasa';
+  const sat = state.lapakItemName.includes('AT') ? 'pcs' : 'kg';
+  const now = new Date();
+  const jam = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+  state.uangMasukPelunasan += est;
+  state.lapakHistory.unshift({ jam, nama, detail: state.lapakItemName + ' · ' + state.lapakKg + ' ' + sat, total: est, status: 'Lunas' });
+  state.lapakBorrowerName = '';
+  toast('✓ Lunas ' + rp(est) + ' masuk kas!');
+  render();
+}
+
+function addPinjemBarang(isNyenteng = false) {
+  const nama = (state.lapakBorrowerName || '').trim() || (isNyenteng ? 'Pelanggan Nyenteng' : 'Peminjam Lapak');
+  const barang = state.lapakItemName;
+  const satuan = barang.includes('AT') ? 'pcs' : 'kg';
+  const qty = Number(state.lapakKg || 0);
+  if (!qty) { toast('Isi jumlah/berat dulu!'); return; }
+  const est = Math.round(qty * Number(state.lapakHarga || 0));
+  const now = new Date();
+  const jam = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+  state.lapakHistory.unshift({ jam, nama, detail: barang + ' · ' + qty + ' ' + satuan, total: isNyenteng ? 0 : est, status: isNyenteng ? 'Nyenteng' : 'Pinjem' });
+  const existing = state.nyentengList.find(x => x.nama.toLowerCase() === nama.toLowerCase());
+  if (existing) {
+    const it = existing.items.find(i => i.barang === barang);
+    if (it) {
+      it.riwayat += '+' + qty;
+      it.qty += qty;
+    } else {
+      existing.items.push({ barang, riwayat: String(qty), satuan, qty });
+    }
+    if (state.lapakNote) existing.catatan = (existing.catatan ? existing.catatan + ' · ' : '') + state.lapakNote;
+    existing.totalTagihan += est;
+    existing.bayarInput = existing.totalTagihan;
+    toast('✓ Ditumpuk ke catatan ' + existing.nama + '!');
+  } else {
+    state.nyentengList.unshift({
+      id: 'PJM-0' + (state.nyentengList.length + 1),
+      nama,
+      tipe: isNyenteng ? 'Nyenteng' : state.lapakBuyerType,
+      items: [{ barang, riwayat: String(qty), satuan, qty }],
+      catatan: state.lapakNote || '',
+      totalTagihan: est,
+      bayarInput: est,
+      metode: 'Tunai'
+    });
+    toast('✓ Catatan ' + nama + ' masuk Belum Bayar!');
+  }
+  state.lapakNote = '';
+  render();
+}
+
+function lunasiNyenteng(idx) {
+  const n = state.nyentengList[idx];
+  const sisaTagihan = Math.max(0, Number(n.totalTagihan || 0) - Number(n.sudahBayar || 0));
+  const bayar = Number(n.bayarInput || 0);
+  const selisih = Math.max(0, sisaTagihan - bayar);
+  state.uangMasukPelunasan += bayar;
+  if (selisih > 0) {
+    state.totalDiskonBulan += selisih;
+    state.totalBonDiskon++;
+  }
+  state.nyentengList.splice(idx, 1);
+  toast('✓ ' + n.nama + ' Lunas (' + n.metode + ')! Uang masuk ' + rp(bayar) + (selisih > 0 ? ' · Diskon ' + rp(selisih) : ''));
+  render();
+}
+
+function cicilBon(idx) {
+  const b = state.bonSavedList[idx];
+  const bayar = Number(b.bayarInput || 0);
+  if (!bayar) { toast('Isi nominal bayar dulu!'); return; }
+  b.sudahBayar = Number(b.sudahBayar || 0) + bayar;
+  state.uangMasukPelunasan += bayar;
+  const sisa = Math.max(0, b.total - b.sudahBayar);
+  b.bayarInput = sisa;
+  toast('✓ Cicilan ' + b.id + ' (' + rp(bayar) + ') masuk! Sisa tagihan: ' + rp(sisa));
+  render();
+}
+
+function lunasiBon(idx) {
+  const b = state.bonSavedList[idx];
+  const sisaTagihan = Math.max(0, b.total - Number(b.sudahBayar || 0));
+  const bayar = Number(b.bayarInput || 0);
+  const selisih = Math.max(0, sisaTagihan - bayar);
+  b.status = 'Lunas';
+  state.uangMasukPelunasan += bayar;
+  if (selisih > 0) {
+    state.totalDiskonBulan += selisih;
+    state.totalBonDiskon++;
+  }
+  toast('✓ ' + b.id + ' Lunas (' + b.metode + ')! Uang masuk ' + rp(bayar) + (selisih > 0 ? ' · Diskon ' + rp(selisih) : ''));
+  render();
+}
+
+function saveBonEntry(tot) {
+  const kg = Number(state.bonKg || 0);
+  const ekor = Number(state.bonEkor || 0);
+  const harga = Number(state.bonHarga || 0);
+  if (!kg || !harga) { toast('Isi Timbangan (kg) & Harga /kg dulu!'); return; }
+  if (!state.pedagangDone.includes(state.pedagangSelected)) {
+    state.pedagangDone.push(state.pedagangSelected);
+  }
+  state.bonSavedList.unshift({
+    id: 'BON-' + (103 + state.bonSavedList.length),
+    tgl: state.bonTanggal,
+    shift: state.shift,
+    pedagang: state.pedagangSelected,
+    kg,
+    ekor,
+    harga,
+    total: tot,
+    bayarInput: tot,
+    metode: 'Tunai',
+    note: state.bonNote || '',
+    status: 'Belum Bayar'
+  });
+  state.bonEntriesCount++;
+  state.bonEntriesKg += kg;
+  state.bonEntriesEkor += ekor;
+  state.bonEntriesRp += tot;
+  state.bonTagihan = tot;
+  state.bonBayar = tot;
+  state.bonLunas = false;
+  state.bonKg = '';
+  state.bonEkor = '';
+  state.bonNote = '';
+  toast('✓ Bon ' + state.pedagangSelected + ' tersimpan! Masuk Belum Bayar Kasir Lapak.');
+  render();
+}
+
+function saveStokKandang(sisaSistem) {
+  const val = Number(state.stokInputVal);
+  if (!state.stokInputVal) { toast('Isi jumlah ekor aktual dulu!'); return; }
+  const now = new Date();
+  const jam = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ' WIB';
+  const diff = val - sisaSistem;
+  const status = diff === 0 ? 'Sesuai' : (diff > 0 ? '+' + diff + ' ekor' : diff + ' ekor');
+  state.stokLog.unshift({ shift: state.stokShift, ekor: val, jam, status });
+  state.stokInputVal = '';
+  toast('✓ Stok ' + state.stokShift + ' (' + val + ' ekor) tersimpan!');
+  render();
+}
+
+function addAbsen() {
+  const nm = (state.absenNama || '').trim();
+  if (!nm) { toast('Ketik nama pekerja dulu!'); return; }
+  const now = new Date();
+  const jam = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+  state.absenList.push({ nama: nm, bagian: state.absenBagian, jam });
+  state.absenNama = '';
+  toast('✓ ' + nm + ' masuk daftar absen!');
+  render();
+  setTimeout(() => { const el = document.getElementById('abIn'); if (el) el.focus(); }, 30);
+}
+
+function handlePtPhoto(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  state.ptForm.fotoName = file.name;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    state.ptForm.fotoUrl = e.target.result;
+    toast('Foto dokumen "' + file.name + '" siap disimpan!');
+    render();
+  };
+  reader.readAsDataURL(file);
+}
+
+function editPtDoc(idx) {
+  const it = state.ptSavedList[idx];
+  state.ptEditingIdx = idx;
+  state.ptForm = {
+    ptName: it.ptName || '',
+    noDo: it.noDo || '',
+    lokasi: it.lokasi || '',
+    armada: it.armada || 'FUSO',
+    kepada: it.kepada || '',
+    totalEkor: String(it.totalEkor || ''),
+    totalBerat: String(it.totalBerat || ''),
+    obEkor: String(it.obEkor || ''),
+    doa: String(it.doa || ''),
+    fotoName: it.fotoName || '',
+    fotoUrl: it.fotoUrl || ''
+  };
+  toast('Mode Edit: ubah jumlah OB / data lalu klik Simpan Perubahan.');
+  render();
+  document.getElementById('appContent').scrollTop = 0;
+}
+
+function cancelEditPt() {
+  state.ptEditingIdx = null;
+  state.ptForm = { ptName: '', noDo: '', lokasi: '', armada: 'FUSO', kepada: '', totalEkor: '', totalBerat: '', obEkor: '', doa: '', fotoName: '', fotoUrl: '' };
+  render();
+}
+
+function savePtDoc() {
+  const f = state.ptForm;
+  if (!f.ptName && !f.totalEkor) {
+    toast('Isi minimal Nama PT & Total Ekor dulu!');
+    return;
+  }
+  const totEk = Number(f.totalEkor || 0);
+  const obEk = Number(f.obEkor || 0);
+  const doaEk = Number(f.doa || 0);
+  const tuOtomatis = Math.max(0, totEk - obEk - doaEk);
+  const now = new Date();
+  const jam = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ' WIB';
+  const entry = {
+    ptName: f.ptName || 'PT / Supplier',
+    noDo: f.noDo || '-',
+    lokasi: f.lokasi || '',
+    armada: f.armada || 'FUSO',
+    kepada: f.kepada || '',
+    totalEkor: totEk,
+    totalBerat: Number(f.totalBerat || 0),
+    obEkor: obEk,
+    tuEkor: tuOtomatis,
+    doa: doaEk,
+    fotoName: f.fotoName || '',
+    fotoUrl: f.fotoUrl || '',
+    jam
+  };
+  if (state.ptEditingIdx !== null) {
+    const oldTu = Number(state.ptSavedList[state.ptEditingIdx].tuEkor || 0);
+    state.ptTuEkor = state.ptTuEkor - oldTu + entry.tuEkor;
+    state.ptSavedList[state.ptEditingIdx] = entry;
+    state.ptEditingIdx = null;
+    toast('✓ Perubahan OB & data tersimpan!');
+  } else {
+    state.ptSavedList.unshift(entry);
+    state.ptTuEkor += entry.tuEkor;
+    toast('✓ Berhasil diinput! Kolom dikosongkan untuk mobil berikutnya.');
+  }
+  state.ptForm = { ptName: '', noDo: '', lokasi: '', armada: 'FUSO', kepada: '', totalEkor: '', totalBerat: '', obEkor: '', doa: '', fotoName: '', fotoUrl: '' };
+  render();
+}
+
+function tapPin(k) {
+  if (k === 'del') {
+    state.pin = state.pin.slice(0, -1);
+  } else if (state.pin.length < 4) {
+    state.pin += k;
+  }
+  if (state.pin.length === 4) {
+    setTimeout(() => {
+      toast('PIN cocok! Masuk sebagai ' + state.selectedLoginArea.toUpperCase());
+      switchRole(state.selectedLoginArea);
+    }, 180);
+  } else {
+    render();
+  }
+}
+
+const ICO = {
+  home: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  box: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+  grid: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>',
+  receipt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>',
+  file: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="8" x2="16" y1="13" y2="13"/><line x1="8" x2="14" y1="17" y2="17"/></svg>',
+  store: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M2 7h20v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0V7z"/></svg>',
+  clock: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>',
+  wallet: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>',
+  shield: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
+};
+
+function renderNav() {
+  const nav = document.getElementById('bottomNav');
+  if (state.role === 'login') {
+    nav.style.display = 'none';
+    return;
+  }
+  nav.style.display = 'flex';
+  const menus = {
+    owner: [
+      { id: 'home', ico: ICO.home, lbl: 'Beranda' },
+      { id: 'pt', ico: ICO.box, lbl: 'Masuk PT' },
+      { id: 'kandang', ico: ICO.grid, lbl: 'Kandang' },
+      { id: 'tagihan', ico: ICO.receipt, lbl: 'Keuangan' },
+    ],
+    admin: [
+      { id: 'pt', ico: ICO.box, lbl: 'Masuk Barang' },
+      { id: 'kandang', ico: ICO.grid, lbl: 'Kandang' },
+      { id: 'bon', ico: ICO.file, lbl: 'Input Bon' },
+    ],
+    lapak: [
+      { id: 'lapak', ico: ICO.store, lbl: 'Kasir Lapak' },
+      { id: 'nyenteng', ico: ICO.clock, lbl: `Belum Bayar (${state.nyentengList.length + state.bonSavedList.filter(b => b.status === 'Belum Bayar').length})` },
+      { id: 'pengeluaran', ico: ICO.wallet, lbl: 'Pengeluaran' },
+    ]
+  };
+  const items = menus[state.role] || [];
+  nav.innerHTML = items.map(m => `
+    <button class="${state.tab === m.id ? 'active' : ''}" onclick="state.tab='${m.id}';render()">
+      <span class="ico">${m.ico}</span>
+      <span>${m.lbl}</span>
+    </button>
+  `).join('');
+}
+
+function render() {
+  const tb = document.querySelector('.toolbar');
+  if (tb && (LOCKED === 'admin' || LOCKED === 'lapak')) {
+    tb.style.display = 'none';
+  }
+  const pill = document.getElementById('headerRole');
+  if (pill && (LOCKED === 'admin' || LOCKED === 'lapak')) {
+    pill.onclick = null;
+    pill.style.cursor = 'default';
+  }
+  const pillMap = {
+    login: ['Login APK', 'b-gray'],
+    owner: ['Owner Only', 'b-blue'],
+    admin: ['Admin', 'b-purple'],
+    lapak: ['Kasir Lapak', 'b-amber']
+  };
+  pill.textContent = pillMap[state.role][0];
+  pill.className = 'role-pill ' + pillMap[state.role][1];
+
+  renderNav();
+  const c = document.getElementById('appContent');
+
+  // 1. LOGIN
+  if (state.role === 'login') {
+    c.innerHTML = `
+      <h2>Masuk ke Aplikasi</h2>
+      <div style="font-size:12px;color:var(--muted);margin:-6px 0 12px;">Pilih peran lalu masukkan 4 digit PIN</div>
+      <button class="area-btn ${state.selectedLoginArea==='owner'?'selected':''}" onclick="state.selectedLoginArea='owner';render()">
+        <div class="t" style="display:flex;align-items:center;gap:8px;">${ICO.shield} Owner</div>
+        <div class="d">Laba bersih, modal PT, penagihan, & pantauan stok</div>
+      </button>
+      <button class="area-btn ${state.selectedLoginArea==='admin'?'selected':''}" onclick="state.selectedLoginArea='admin';render()">
+        <div class="t" style="display:flex;align-items:center;gap:8px;">${ICO.file} Admin</div>
+        <div class="d">Barang masuk PT, kandang, absen, & input bon</div>
+      </button>
+      <button class="area-btn ${state.selectedLoginArea==='lapak'?'selected':''}" onclick="state.selectedLoginArea='lapak';render()">
+        <div class="t" style="display:flex;align-items:center;gap:8px;">${ICO.store} Kasir Lapak</div>
+        <div class="d">POS penjualan, stok parting, belum bayar, & kas</div>
+      </button>
+      <div class="card" style="margin-top:12px;">
+        <div style="font-size:12.5px;font-weight:700;text-align:center;">Masukkan PIN (${state.selectedLoginArea.toUpperCase()})</div>
+        <div class="pin-dots">
+          ${[0,1,2,3].map(i => `<div class="dot ${i < state.pin.length ? 'fill' : ''}"></div>`).join('')}
+        </div>
+        <div class="numpad">
+          ${[1,2,3,4,5,6,7,8,9].map(n => `<button onclick="tapPin('${n}')">${n}</button>`).join('')}
+          <button style="background:var(--blue-soft);color:var(--blue);font-size:12px;" onclick="switchRole(state.selectedLoginArea)">Masuk</button>
+          <button onclick="tapPin('0')">0</button>
+          <button onclick="tapPin('del')">⌫</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // 2. OWNER BERANDA
+  if (state.tab === 'home') {
+    const sisaKandang = state.kandangAwal + state.ptTuEkor - state.kandangKeluar - state.kandangMati;
+    const modalFuso = state.ptKgFuso * state.ptModalFuso;
+    const modalL300 = state.ptKgL300 * state.ptModalL300;
+    const modalHarian = modalFuso + modalL300;
+    const lapakExpToday = state.pengeluaran.reduce((s, p) => s + p.rp, 0);
+    const kandangExpToday = state.kandangPengeluaran.reduce((s, p) => s + p.rp, 0);
+    const tl = {
+      Harian: {
+        label: 'HARI INI (15 NOV)',
+        omzet: 98500000,
+        modal: modalHarian,
+        biayaKandang: kandangExpToday,
+        biayaLapak: lapakExpToday,
+        biaya: kandangExpToday + lapakExpToday,
+        diskon: 12000,
+        masukEkor: 2380,
+        matiTotal: state.ptDoa + state.kandangMati,
+        tren: '↑ 8,2% vs kemarin'
+      },
+      Mingguan: {
+        label: 'MINGGU INI (7 HARI)',
+        omzet: 672400000,
+        modal: modalHarian * 6.8,
+        biayaKandang: 2345000,
+        biayaLapak: 835000,
+        biaya: 3180000,
+        diskon: 64500,
+        masukEkor: 16240,
+        matiTotal: 58,
+        tren: '↑ 5,4% vs minggu lalu'
+      },
+      Bulanan: {
+        label: 'BULAN NOV 2026',
+        omzet: 2845000000,
+        modal: modalHarian * 28.5,
+        biayaKandang: 9850000,
+        biayaLapak: 3600000,
+        biaya: 13450000,
+        diskon: state.totalDiskonBulan,
+        masukEkor: 68900,
+        matiTotal: 234,
+        tren: '↑ 11,0% vs Okt 2026'
+      }
+    }[state.ownerTimeline];
+    const estProfit = tl.omzet - tl.modal - tl.biaya - tl.diskon;
+    c.innerHTML = `
+      <h2>Ringkasan Owner</h2>
+      <div class="seg" style="margin-bottom:10px;">
+        ${['Harian','Mingguan','Bulanan'].map(t => `
+          <button class="${state.ownerTimeline===t?'on':''}" onclick="state.ownerTimeline='${t}';render()">${t}</button>
+        `).join('')}
+      </div>
+      <div class="card-dark">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10px;font-weight:700;color:var(--subtle);letter-spacing:0.03em;">LABA BERSIH · ${tl.label}</span>
+          <span class="badge b-green">${tl.tren}</span>
+        </div>
+        <div style="font-size:24px;font-weight:800;letter-spacing:-0.03em;margin:6px 0 8px;">${rp(estProfit)}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10.5px;color:var(--subtle);border-top:1px solid #334155;padding-top:8px;">
+          <div>Omzet: <strong style="color:#fff;">${rp(tl.omzet)}</strong></div>
+          <div>Modal PT: <strong style="color:#fff;">${rp(tl.modal)}</strong></div>
+          <div>Biaya Ops: <strong style="color:#FCA5A5;">−${rp(tl.biaya)}</strong></div>
+          <div>Diskon: <strong style="color:#FCD34D;">−${rp(tl.diskon)}</strong></div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="kpi"><div class="lbl">Masuk (${state.ownerTimeline})</div><div class="val">${tl.masukEkor.toLocaleString('id-ID')} ekor</div><div class="sub" style="color:var(--red)">Mati: ${tl.matiTotal} ekor</div></div>
+        <div class="kpi"><div class="lbl">Stok Kandang</div><div class="val">${sisaKandang} ekor</div><div class="sub" style="color:var(--blue)">Tersedia saat ini</div></div>
+        <div class="kpi"><div class="lbl">Piutang Bon</div><div class="val">${rp(state.bonSavedList.filter(b=>b.status==='Belum Bayar').reduce((s,b)=>s+(b.total-(b.sudahBayar||0)),0))}</div><div class="sub" style="color:var(--amber)">${state.bonSavedList.filter(b=>b.status==='Belum Bayar').length} bon aktif</div></div>
+        <div class="kpi"><div class="lbl">Nyenteng Lapak</div><div class="val">${state.nyentengList.length} orang</div><div class="sub" style="color:var(--blue)">Belum lunas</div></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="font-size:13px;">Pengeluaran (${state.ownerTimeline})</strong>
+          <strong style="font-size:13px;color:var(--red);">${rp(tl.biaya)}</strong>
+        </div>
+        <div style="font-size:11.5px;display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid var(--border);">
+          <span style="color:var(--muted);">Kandang (Bensin, Jalan, Usus)</span>
+          <strong>${rp(tl.biayaKandang)}</strong>
+        </div>
+        <div style="font-size:11.5px;display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid var(--border);">
+          <span style="color:var(--muted);">Lapak (Es, Plastik, dll)</span>
+          <strong>${rp(tl.biayaLapak)}</strong>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="font-size:13px;">Stok Freezer & Opname</strong>
+          <span class="badge b-blue">${state.freezerStock.reduce((s,x)=>s+x.kgSistem,0).toFixed(1)} kg di Freezer</span>
+        </div>
+        ${state.freezerStock.map(st => {
+          const diff = Number((st.kgAktual - st.kgSistem).toFixed(1));
+          return `
+            <div style="font-size:11.5px;padding:4px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;">
+              <span><strong>${st.item}</strong> (${st.kantong} ktg · ${st.kgSistem} kg) <span style="color:var(--subtle)">· ${st.umur}</span></span>
+              <span class="badge ${diff===0?'b-green':'b-red'}">${diff===0?'✓ Pas':'Selisih '+diff+' kg'}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Ringkasan Truk Masuk (FUSO & L300)</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;text-align:center;">
+          <div style="background:var(--bg);padding:8px;border-radius:8px;border:1px solid var(--border);"><div style="font-size:10px;color:var(--muted);font-weight:700;">EKOR</div><strong style="font-size:14px;">2.380</strong></div>
+          <div style="background:var(--bg);padding:8px;border-radius:8px;border:1px solid var(--border);"><div style="font-size:10px;color:var(--muted);font-weight:700;">BERAT</div><strong style="font-size:14px;">4.135 kg</strong></div>
+          <div style="background:var(--bg);padding:8px;border-radius:8px;border:1px solid var(--border);"><div style="font-size:10px;color:var(--muted);font-weight:700;">ABW</div><strong style="font-size:14px;">1,74 kg</strong></div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;text-align:right;">
+          <thead>
+            <tr style="color:var(--muted);border-bottom:1px solid var(--border);">
+              <th style="text-align:left;padding:4px 0;">TRUK</th><th>EKOR</th><th>OB</th><th>KDG</th><th>MATI</th><th>ABW</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="text-align:left;padding:6px 0;font-weight:700;">FUSO ✓<div style="font-size:9.5px;color:var(--muted);font-weight:500;">2.718 kg</div></td>
+              <td>1.280</td><td>830</td><td>446</td><td style="color:var(--red);">4</td><td style="font-weight:700;">2,12</td>
+            </tr>
+            <tr>
+              <td style="text-align:left;padding:6px 0;font-weight:700;">L300 ✓<div style="font-size:9.5px;color:var(--muted);font-weight:500;">1.417 kg</div></td>
+              <td>1.100</td><td>700</td><td>398</td><td style="color:var(--red);">2</td><td style="font-weight:700;">1,29</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Dokumen Masuk PT (Dari Admin)</div>
+        ${state.ptSavedList.map((item, idx) => `
+          <div style="padding:8px 0;${idx < state.ptSavedList.length - 1 ? 'border-bottom:1px solid var(--border);' : ''}">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong style="font-size:12.5px;">${item.ptName} · DO ${item.noDo}</strong>
+              <span class="badge ${item.armada==='FUSO'?'b-blue':'b-purple'}">${item.armada}</span>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin:3px 0 6px;">${item.totalEkor} ekor · OB ${item.obEkor} · TU ${item.tuEkor} · Mati ${item.doa}</div>
+            <button class="btn btn-soft" style="padding:7px;font-size:11.5px;" onclick="state.previewFoto=state.ptSavedList[${idx}];render()">
+              ${item.fotoUrl ? 'Lihat Foto Dokumen ('+item.fotoName+')' : 'Lihat Foto Dokumen ('+(item.fotoName||'Lampiran')+')'}
+            </button>
+          </div>
+        `).join('')}
+      </div>
+      ${state.previewFoto ? `
+        <div class="card" style="border:2px solid var(--blue);background:var(--blue-soft);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <strong style="font-size:12.5px;color:var(--navy);">Preview: ${state.previewFoto.ptName} (${state.previewFoto.armada})</strong>
+            <button style="border:0;background:var(--navy);color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;" onclick="state.previewFoto=null;render()">Tutup ✕</button>
+          </div>
+          ${state.previewFoto.fotoUrl
+            ? `<img src="${state.previewFoto.fotoUrl}" style="width:100%;border-radius:8px;max-height:220px;object-fit:contain;background:#fff;" />`
+            : `<div style="background:#fff;border:1px dashed var(--blue-border);border-radius:8px;padding:24px;text-align:center;font-size:12px;color:var(--muted);">Foto contoh (${state.previewFoto.fotoName || 'dokumen.jpg'}). Upload foto asli di menu Admin → Masuk Barang untuk lihat gambar aslinya di sini!</div>`
+          }
+        </div>
+      ` : ''}
+    `;
+    return;
+  }
+
+  // 3. DOKUMEN MASUK PT
+  if (state.tab === 'pt') {
+    const f = state.ptForm;
+    const totEk = Number(f.totalEkor || 0);
+    const totBrt = Number(f.totalBerat || 0);
+    const abw = totEk > 0 && totBrt > 0 ? (totBrt / totEk).toFixed(2).replace('.', ',') : '0,00';
+    const obEk = Number(f.obEkor || 0);
+    const doaEk = Number(f.doa || 0);
+    const tuOtomatis = Math.max(0, totEk - obEk - doaEk);
+    const invalid = totEk > 0 && (obEk + doaEk > totEk);
+    c.innerHTML = `
+      <h2>Dokumen Masuk PT <span class="badge b-gray">Modal Owner</span></h2>
+      <div class="card">
+        <div class="row">
+          <div><label>Nama PT / Farm</label><input placeholder="Contoh: PT. Sido Mukti" value="${f.ptName}" oninput="state.ptForm.ptName=this.value" /></div>
+          <div style="flex:0 0 110px"><label>No. DO / SPPA</label><input placeholder="000103" value="${f.noDo}" oninput="state.ptForm.noDo=this.value" /></div>
+        </div>
+        <div class="row">
+          <div><label>Lokasi / Kandang</label><input placeholder="Lokasi kandang" value="${f.lokasi}" oninput="state.ptForm.lokasi=this.value" /></div>
+          <div>
+            <label>Armada</label>
+            <select onchange="state.ptForm.armada=this.value">
+              <option value="FUSO" ${f.armada==='FUSO'?'selected':''}>FUSO</option>
+              <option value="L300" ${f.armada==='L300'?'selected':''}>L300</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div><label>Kepada Yth (DO)</label><input placeholder="Nama tujuan" value="${f.kepada}" oninput="state.ptForm.kepada=this.value" /></div>
+          <div><label>Total Ekor DO</label><input type="number" placeholder="0" value="${f.totalEkor}" oninput="state.ptForm.totalEkor=this.value;render()" /></div>
+        </div>
+        <div class="row">
+          <div><label>Total Berat DO (kg)</label><input type="number" step="0.1" placeholder="0.0" value="${f.totalBerat}" oninput="state.ptForm.totalBerat=this.value;render()" /></div>
+          <div>
+            <label>ABW (Rata-rata)</label>
+            <div style="padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:#F1F5F9;font-size:13px;font-weight:700;margin-bottom:10px;color:var(--blue);">${abw} kg/ekor</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Bagi Jalur Turun Mobil</div>
+        <div class="row">
+          <div>
+            <label style="color:var(--blue)">1. Overbon / OB (ekor)</label>
+            <input type="number" placeholder="Ekor OB" value="${f.obEkor}" oninput="state.ptForm.obEkor=this.value;render()" />
+          </div>
+          <div>
+            <label style="color:var(--red)">2. Mati Turun Mobil (ekor)</label>
+            <input type="number" placeholder="0" value="${f.doa}" oninput="state.ptForm.doa=this.value;render()" />
+          </div>
+        </div>
+        <div style="background:${invalid ? 'var(--red-soft)' : 'var(--green-soft)'};border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11.5px;font-weight:700;color:${invalid ? 'var(--red)' : 'var(--green)'};">
+            ${invalid ? '⚠ OB + Mati melebihi Total Ekor DO!' : '3. Masuk Kandang / TU (Otomatis):'}
+          </span>
+          <strong style="font-size:15px;color:${invalid ? 'var(--red)' : 'var(--green)'};">${invalid ? 'Cek Ulang' : tuOtomatis + ' ekor'}</strong>
+        </div>
+      </div>
+      <div class="card">
+        <label>Upload Foto Dokumen PT (Untuk Dicek Owner)</label>
+        <input type="file" accept="image/*" style="background:#fff;padding:7px;" onchange="handlePtPhoto(this)" />
+        ${f.fotoName ? `<div style="font-size:11.5px;color:var(--green);font-weight:600;">✓ Terpilih: ${f.fotoName}</div>` : `<div style="font-size:11px;color:var(--muted);">Pastikan foto dokumen tidak blur agar mudah dicek Owner.</div>`}
+      </div>
+      <div class="row" style="margin-bottom:14px;">
+        ${state.ptEditingIdx !== null ? `<button class="btn btn-soft" onclick="cancelEditPt()">Batal Edit</button>` : ''}
+        <button class="btn btn-blue" onclick="savePtDoc()">${state.ptEditingIdx !== null ? 'Simpan Perubahan Data' : 'Simpan Dokumen Masuk PT'}</button>
+      </div>
+
+      <strong style="font-size:13px;display:block;margin-bottom:8px;">Sudah Berhasil Diinput Hari Ini (${state.ptSavedList.length})</strong>
+      ${state.ptSavedList.map((item, idx) => `
+        <div class="card" style="padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <strong style="font-size:13px;">${item.ptName || 'PT / Supplier'} · DO ${item.noDo || '-'}</strong>
+            <span class="badge b-green">✓ Berhasil</span>
+          </div>
+          <div style="font-size:11.5px;color:var(--muted);margin-bottom:6px;"><span class="badge ${item.armada==='FUSO'?'b-blue':'b-purple'}">${item.armada}</span> · Total: <strong>${item.totalEkor} ekor (${item.totalBerat || 0} kg)</strong> · OB: ${item.obEkor} · TU: ${item.tuEkor} · Mati: ${item.doa}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:10.5px;color:var(--subtle);">Input jam ${item.jam} ${item.fotoName ? '· ' + item.fotoName : ''}</span>
+            <button style="border:1px solid var(--border);background:var(--bg);color:var(--blue);border-radius:6px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;" onclick="editPtDoc(${idx})">✎ Edit OB / Data</button>
+          </div>
+        </div>
+      `).join('')}
+    `;
+    return;
+  }
+
+  // 4. KANDANG, ABSEN & STOK FREEZER/OPNAME
+  if (state.tab === 'kandang') {
+    const sisa = state.kandangAwal + state.ptTuEkor - state.kandangKeluar - state.kandangMati;
+    c.innerHTML = `
+      <h2>Kandang & Stok Freezer</h2>
+      <div class="seg">
+        <button class="${state.kandangSubTab==='hidup'?'on':''}" onclick="state.kandangSubTab='hidup';render()">Hidup</button>
+        <button class="${state.kandangSubTab==='freezer'?'on':''}" onclick="state.kandangSubTab='freezer';render()">Freezer</button>
+        <button class="${state.kandangSubTab==='keluar'?'on':''}" onclick="state.kandangSubTab='keluar';render()">Pengeluaran</button>
+      </div>
+      ${state.kandangSubTab === 'keluar' ? `
+        <div class="card">
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Pengeluaran Operasional Kandang</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
+            ${['Pembelian Bensin','Uang Jalan','Pembayaran Usus','Makan Tim'].map(k => `<button class="chip" onclick="state.kdExpKet='${k}';render()">${k}</button>`).join('')}
+          </div>
+          <label>Keperluan</label>
+          <input placeholder="Contoh: Bensin / Uang Jalan / Usus" value="${state.kdExpKet}" oninput="state.kdExpKet=this.value" />
+          <label>Nominal (Rp)</label>
+          <input type="number" placeholder="0" value="${state.kdExpRp}" oninput="state.kdExpRp=this.value" />
+          <button class="btn btn-blue" onclick="addKandangExp()">+ Simpan Pengeluaran Kandang</button>
+        </div>
+        <div class="card">
+          <strong style="font-size:12.5px;display:block;margin-bottom:6px;">Riwayat Pengeluaran Kandang (${state.kandangPengeluaran.length})</strong>
+          ${state.kandangPengeluaran.map(kp => `
+            <div style="font-size:11.5px;padding:6px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+              <div><strong>${kp.ket}</strong><div style="font-size:10px;color:var(--muted);">${kp.jam} · ${kp.sumber}</div></div>
+              <strong style="color:var(--red);">${rp(kp.rp)}</strong>
+            </div>
+          `).join('')}
+        </div>
+      ` : state.kandangSubTab === 'freezer' ? `
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <strong style="font-size:13px;">Stock Opname Freezer</strong>
+            <span class="badge b-blue">${state.freezerStock.reduce((s,x)=>s+x.kgSistem,0).toFixed(1)} kg</span>
+          </div>
+          <div class="row" style="margin-bottom:10px;">
+            <button class="btn btn-soft" style="padding:7px;font-size:11px;border:1px solid var(--blue-border);" onclick="state.showSaldoAwalFreezer=!state.showSaldoAwalFreezer;state.showKeluarFreezer=false;render()">+ Saldo Awal</button>
+            <button class="btn btn-red" style="padding:7px;font-size:11px;" onclick="state.showKeluarFreezer=!state.showKeluarFreezer;state.showSaldoAwalFreezer=false;render()">Keluar ke Lapak</button>
+          </div>
+          ${state.showSaldoAwalFreezer ? `
+            <div style="background:var(--blue-soft);border:1px solid var(--blue-border);border-radius:10px;padding:10px;margin-bottom:10px;">
+              <div style="font-size:11.5px;font-weight:800;color:var(--navy);margin-bottom:6px;">Input Saldo Awal Freezer (Stok Sebelumnya)</div>
+              <div class="row" style="margin-bottom:6px;">
+                <select style="margin:0;background:#fff;" onchange="state.saldoAwalItem=this.value">
+                  ${state.lapakItems.map(x => `<option value="${x.id}" ${state.saldoAwalItem===x.id?'selected':''}>${x.id}</option>`).join('')}
+                </select>
+                <input type="number" placeholder="Ktg" value="${state.saldoAwalKtg}" oninput="state.saldoAwalKtg=this.value" style="flex:0 0 60px;margin:0;background:#fff;" />
+                <input type="number" step="0.1" placeholder="Kg" value="${state.saldoAwalKg}" oninput="state.saldoAwalKg=this.value" style="flex:0 0 68px;margin:0;background:#fff;" />
+              </div>
+              <button class="btn btn-blue" style="padding:8px;font-size:11.5px;" onclick="addSaldoAwalFreezer()">Simpan Saldo Awal ke Freezer</button>
+            </div>
+          ` : ''}
+          ${state.showKeluarFreezer ? `
+            <div style="background:var(--red-soft);border:1px solid #FECACA;border-radius:10px;padding:10px;margin-bottom:10px;">
+              <div style="font-size:11.5px;font-weight:800;color:var(--red);margin-bottom:6px;">Barang Freezer Keluar Malam (Kirim ke Lapak)</div>
+              <div class="row" style="margin-bottom:6px;">
+                <select style="margin:0;background:#fff;" onchange="state.saldoAwalItem=this.value">
+                  ${state.lapakItems.map(x => `<option value="${x.id}" ${state.saldoAwalItem===x.id?'selected':''}>${x.id}</option>`).join('')}
+                </select>
+                <input type="number" placeholder="Ktg" value="${state.saldoAwalKtg}" oninput="state.saldoAwalKtg=this.value" style="flex:0 0 60px;margin:0;background:#fff;" />
+                <input type="number" step="0.1" placeholder="Kg" value="${state.saldoAwalKg}" oninput="state.saldoAwalKg=this.value" style="flex:0 0 68px;margin:0;background:#fff;" />
+              </div>
+              <button class="btn btn-red" style="padding:8px;font-size:11.5px;background:var(--red);color:#fff;" onclick="keluarFreezerMalam()">Catat Keluar ke Lapak (−)</button>
+            </div>
+          ` : ''}
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Cek jumlah kantong & berat aktual di freezer lalu bandingkan dengan catatan sistem.</div>
+          ${state.freezerStock.map((st, idx) => {
+            const diff = Number((st.kgAktual - st.kgSistem).toFixed(1));
+            return `
+              <div style="padding:8px 0;border-top:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <strong style="font-size:12.5px;">${st.item} <span style="color:var(--muted);font-weight:500;">(${st.kantong} kantong)</span></strong>
+                  <span class="badge ${st.umur.includes('Kemarin')?'b-amber':'b-gray'}">${st.umur}</span>
+                </div>
+                <div class="row" style="align-items:center;">
+                  <div style="font-size:11.5px;color:var(--muted);">Sistem: <strong style="color:var(--navy);">${st.kgSistem} kg</strong></div>
+                  <div style="flex:0 0 96px;">
+                    <input type="number" step="0.1" value="${st.kgAktual}" style="margin:0;padding:5px 7px;font-size:12px;" onchange="state.freezerStock[${idx}].kgAktual=Number(this.value||0);render()" />
+                  </div>
+                  <div style="flex:0 0 76px;text-align:right;">
+                    <span class="badge ${diff===0?'b-green':'b-red'}">${diff===0?'✓ Pas':diff+' kg'}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+          <button class="btn btn-blue" style="margin-top:10px;" onclick="toast('✓ Hasil Stock Opname Freezer tersimpan & dikirim ke Owner!')">Simpan Hasil Stock Opname</button>
+        </div>
+        <div class="card">
+          <strong style="font-size:12.5px;display:block;margin-bottom:6px;">Log Keluar Malam ke Lapak (${state.freezerKeluarLog.length})</strong>
+          ${state.freezerKeluarLog.map(kl => `
+            <div style="font-size:11.5px;padding:5px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;">
+              <span><strong>${kl.item}</strong>: ${kl.ktg} ktg (${kl.kg} kg)</span>
+              <span style="color:var(--muted);">${kl.jam}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : `
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Rekonsiliasi Stok Kandang (TU)</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Awal: ${state.kandangAwal} ekor + Masuk TU: ${state.ptTuEkor} ekor</div>
+        <div id="matiLine" style="font-size:12px;color:var(--red);margin-bottom:10px;">Keluar TU: ${state.kandangKeluar} ekor − Mati Kandang: ${state.kandangMati} ekor</div>
+        <div style="background:var(--blue-soft);border:1px solid var(--blue-border);border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;font-weight:700;color:var(--blue);">SISA AYAM HITUNGAN SISTEM:</span>
+          <strong id="sisaVal" style="font-size:16px;color:var(--navy);">${sisa} ekor</strong>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Input Sisa / Stok Ayam Kandang</div>
+        <div class="seg" style="margin-bottom:8px;">
+          <button class="${state.stokShift==='Malam (Kahfi)'?'on':''}" onclick="state.stokShift='Malam (Kahfi)';render()">Malam (Kahfi)</button>
+          <button class="${state.stokShift==='Siang (Budi)'?'on':''}" onclick="state.stokShift='Siang (Budi)';render()">Siang (Budi)</button>
+        </div>
+        <div class="row" style="align-items:flex-end;">
+          <div>
+            <label>Jumlah Ayam Aktual (${state.stokShift})</label>
+            <input type="number" placeholder="Contoh: ${sisa}" value="${state.stokInputVal}" style="margin:0;" oninput="state.stokInputVal=this.value" />
+          </div>
+          <button class="btn btn-blue" style="flex:0 0 110px;" onclick="saveStokKandang(${sisa})">Simpan Stok</button>
+        </div>
+        <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
+          ${state.stokLog.slice(0,2).map(lg => `
+            <div style="font-size:11.5px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span><strong>${lg.shift}:</strong> ${lg.ekor} ekor <span style="color:var(--subtle)">(${lg.jam})</span></span>
+              <span class="badge ${lg.status==='Sesuai'?'b-green':'b-amber'}">${lg.status}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="row" style="align-items:flex-end;">
+          <div>
+            <label>Mati di Kandang (ekor)</label>
+            <input type="number" id="inMati" value="${state.kandangMati}" style="margin:0;" oninput="state.kandangMati=Number(this.value||0);document.getElementById('sisaVal').textContent=(state.kandangAwal+state.ptTuEkor-state.kandangKeluar-state.kandangMati)+' ekor';document.getElementById('matiLine').textContent='Keluar TU: '+state.kandangKeluar+' ekor − Mati Kandang: '+state.kandangMati+' ekor';" />
+          </div>
+          <button class="btn btn-red" style="flex:0 0 110px;" onclick="toast('Mati di kandang ('+state.kandangMati+' ekor) tersimpan!');render()">Simpan</button>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="font-size:13px;">Absen Pekerja Hari Ini</strong>
+          <span class="badge b-green">${state.absenList.length} Hadir</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:10px;">
+          <thead>
+            <tr style="color:var(--muted);border-bottom:1px solid var(--border);text-align:left;">
+              <th style="padding:4px 0;">No</th><th>Nama</th><th>Bagian</th><th>Jam</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${state.absenList.map((ab, idx) => `
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:6px 0;color:var(--muted);">${idx + 1}</td>
+                <td style="font-weight:700;">${ab.nama}</td>
+                <td><span class="badge ${ab.bagian==='Pemotong'?'b-blue':'b-amber'}">${ab.bagian}</span></td>
+                <td style="color:var(--muted);">${ab.jam}</td>
+                <td style="text-align:right;"><button style="border:0;background:transparent;color:var(--red);font-weight:700;cursor:pointer;" onclick="state.absenList.splice(${idx},1);render()">✕</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div class="row" style="align-items:center;">
+          <input id="abIn" placeholder="Ketik nama pekerja lalu Enter..." value="${state.absenNama}" style="margin:0;" onkeydown="if(event.key==='Enter'){addAbsen()}" oninput="state.absenNama=this.value" />
+          <select style="flex:0 0 98px;margin:0;" onchange="state.absenBagian=this.value">
+            <option value="Pemotong" ${state.absenBagian==='Pemotong'?'selected':''}>Pemotong</option>
+            <option value="Kandang" ${state.absenBagian==='Kandang'?'selected':''}>Kandang</option>
+          </select>
+          <button class="btn btn-blue" style="flex:0 0 54px;padding:9px;" onclick="addAbsen()">+</button>
+        </div>
+      </div>
+      <div class="card">
+        <strong style="font-size:13px;display:block;margin-bottom:8px;">Log Timbang Ulang WA (Al-Amin Barokah)</strong>
+        <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;">
+          <span>Nandi · 15 ekor (32,00 kg)</span><span class="badge b-green">Sudah Bon</span>
+        </div>
+        <div style="font-size:12px;padding:6px 0;display:flex;justify-content:space-between;">
+          <span>Hj. Siti · 30 ekor (43,90 kg)</span><span class="badge b-amber">Belum Bon</span>
+        </div>
+      </div>
+      `}
+    `;
+    return;
+  }
+
+  // 5. INPUT BON ADMIN (Gaya Rekap Jual - Al Amin: Shift + Chip Pedagang + Timbangan/Ekor/Harga + Ringkasan)
+  if (state.tab === 'bon') {
+    const filtered = state.pedagangList.filter(n => n.toLowerCase().includes(state.pedagangSearch.toLowerCase()));
+    const kg = Number(state.bonKg || 0);
+    const hg = Number(state.bonHarga || 0);
+    const tot = Math.round(kg * hg);
+    c.innerHTML = `
+      <h2>Input Bon Keluar <span class="badge b-blue">Shift ${state.shift}</span></h2>
+      <div class="seg">
+        <button class="${state.shift==='MALAM'?'on':''}" onclick="state.shift='MALAM';render()">MALAM</button>
+        <button class="${state.shift==='SIANG'?'on':''}" onclick="state.shift='SIANG';render()">SIANG</button>
+      </div>
+      <div class="card">
+        <div class="row" style="margin-bottom:8px;align-items:center;">
+          <input placeholder="Cari nama pedagang…" value="${state.pedagangSearch}" oninput="state.pedagangSearch=this.value;render()" style="margin:0;" />
+          <button class="btn btn-soft" style="flex:0 0 92px;padding:9px 6px;font-size:11.5px;border:1px solid var(--blue-border);" onclick="state.showAddPedagang=!state.showAddPedagang;render()">+ Pedagang</button>
+        </div>
+        ${state.showAddPedagang ? `
+          <div class="row" style="margin-bottom:8px;padding:8px;background:var(--blue-soft);border-radius:8px;border:1px solid var(--blue-border);">
+            <input placeholder="Ketik nama pedagang baru..." value="${state.newPedagangName}" oninput="state.newPedagangName=this.value" style="margin:0;background:#fff;" onkeydown="if(event.key==='Enter'){addNewPedagang()}" />
+            <button class="btn btn-blue" style="flex:0 0 74px;padding:9px;" onclick="addNewPedagang()">Simpan</button>
+          </div>
+        ` : ''}
+        <div style="display:flex;flex-wrap:wrap;gap:5px;max-height:112px;overflow-y:auto;">
+          ${filtered.map(n => {
+            const done = state.pedagangDone.includes(n);
+            const act = state.pedagangSelected === n;
+            return `<button class="chip ${act?'on':''}" style="${done && !act ? 'background:var(--green-soft);color:var(--green);border-color:#BBF7D0;' : ''}" onclick="state.pedagangSelected='${n}';render()">${n}${done?'✓':''}</button>`;
+          }).join('') || `<button class="chip on" onclick="state.newPedagangName=state.pedagangSearch;addNewPedagang()">+ Tambah "${state.pedagangSearch}"</button>`}
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:13px;font-weight:800;color:var(--blue);">Pedagang: ${state.pedagangSelected}</span>
+          <input type="date" value="${state.bonTanggal}" oninput="state.bonTanggal=this.value" style="width:auto;margin:0;padding:4px 8px;font-size:11.5px;" />
+        </div>
+        <div class="row">
+          <div><label>Timbangan (kg)</label><input type="number" step="0.01" value="${state.bonKg}" oninput="state.bonKg=this.value;render()" /></div>
+          <div><label>Ekor</label><input type="number" value="${state.bonEkor}" oninput="state.bonEkor=this.value;render()" /></div>
+        </div>
+        <label>Harga /kg (Rp)</label>
+        <input type="number" value="${state.bonHarga}" oninput="state.bonHarga=this.value;render()" />
+        <label>Catatan (boleh kosong)</label>
+        <input placeholder="mis: DG 33, Plet 8, ATI 40 · bon 2 lembar…" value="${state.bonNote}" oninput="state.bonNote=this.value" />
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--blue-soft);border-radius:8px;margin-bottom:10px;">
+          <span style="font-size:11.5px;font-weight:700;color:var(--blue);">Total Tagihan Bon:</span>
+          <strong style="font-size:15px;color:var(--navy);">${rp(tot)}</strong>
+        </div>
+        <div class="row">
+          <button class="btn btn-navy" onclick="toast('Struk thermal dicetak!')">Thermal</button>
+          <button class="btn btn-blue" onclick="saveBonEntry(${tot})">SIMPAN BON</button>
+        </div>
+      </div>
+      <div class="card" style="background:var(--navy);color:#fff;padding:12px 14px;">
+        <div style="font-size:11px;color:var(--subtle);">Ringkasan (${state.bonTanggal} · ${state.shift}):</div>
+        <div style="font-size:12.5px;font-weight:700;margin-top:3px;">${state.bonEntriesCount} entri · ${state.bonEntriesKg.toLocaleString('id-ID')} kg · ${state.bonEntriesEkor} ekr · ${rp(state.bonEntriesRp)}</div>
+      </div>
+      <strong style="font-size:13px;display:block;margin:12px 0 8px;">Rekapan Bon Sudah Diinput (${state.bonSavedList.length})</strong>
+      ${state.bonSavedList.map(b => `
+        <div class="card" style="padding:11px 13px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <strong style="font-size:13px;">${b.pedagang} <span style="font-size:10.5px;color:var(--muted);font-weight:500;">(${b.tgl} · ${b.shift})</span></strong>
+            <span class="badge ${b.status==='Lunas'?'b-green':'b-amber'}">${b.status}</span>
+          </div>
+          <div style="font-size:11.5px;color:var(--muted);">${b.kg} kg · ${b.ekor} ekor × ${rp(b.harga)} = <strong style="color:var(--navy);">${rp(b.total)}</strong></div>
+          ${b.note ? `<div style="font-size:10.5px;color:var(--blue);margin-top:3px;">Catatan: ${b.note}</div>` : ''}
+        </div>
+      `).join('')}
+    `;
+    return;
+  }
+
+  // 6. KASIR LAPAK — GAYA POS KASIR MINIMARKET (Multi-item Struk + 1-Tap Bayar / Pinjem / Nyenteng)
+  if (state.tab === 'lapak') {
+    const curItem = state.lapakItems.find(x => x.id === state.lapakItemName) || state.lapakItems[0];
+    const grandTotal = state.lapakCart.reduce((s, it) => s + it.total, 0);
+    c.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:16px;font-weight:800;">Kasir Lapak (POS)</span>
+        <span style="font-size:11px;font-weight:700;color:var(--blue);">Modal Laci: 500rb</span>
+      </div>
+
+      <div class="seg" style="margin-bottom:10px;">
+        <button class="${state.lapakSubTab==='pos'?'on':''}" onclick="state.lapakSubTab='pos';render()">Penjualan</button>
+        <button class="${state.lapakSubTab==='parting'?'on':''}" onclick="state.lapakSubTab='parting';render()">Stok</button>
+      </div>
+
+      ${state.lapakSubTab === 'parting' ? `
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;">
+          ${state.lapakItems.map(it => {
+            const on = state.partingItem === it.id;
+            return `
+              <button onclick="state.partingItem='${it.id}';render()" style="padding:10px 4px;border-radius:10px;border:1.5px solid ${on?'var(--blue)':'var(--border)'};background:${on?'var(--blue-soft)':'#fff'};cursor:pointer;text-align:center;">
+                <div style="font-size:12px;font-weight:800;color:${on?'var(--blue)':'var(--text)'};">${it.short}</div>
+              </button>
+            `;
+          }).join('')}
+          <button onclick="state.showAddItem=!state.showAddItem;render()" style="padding:10px 4px;border-radius:10px;border:1.5px dashed var(--blue);background:var(--blue-soft);cursor:pointer;text-align:center;">
+            <div style="font-size:11.5px;font-weight:800;color:var(--blue);">+ Item</div>
+          </button>
+        </div>
+
+        ${state.showAddItem ? `
+          <div class="card" style="padding:10px;margin-bottom:8px;border-color:var(--blue-border);background:var(--blue-soft);">
+            <div class="row" style="align-items:center;">
+              <input placeholder="Nama item baru (mis: Uritan)" value="${state.newItemName}" oninput="state.newItemName=this.value" style="margin:0;background:#fff;" />
+              <select style="flex:0 0 70px;margin:0;background:#fff;" onchange="state.newItemSat=this.value">
+                <option value="kg" ${state.newItemSat==='kg'?'selected':''}>kg</option>
+                <option value="pcs" ${state.newItemSat==='pcs'?'selected':''}>pcs</option>
+              </select>
+              <button class="btn btn-blue" style="flex:0 0 70px;padding:9px;" onclick="addNewLapakItem();state.partingItem=state.lapakItemName;render()">Simpan</button>
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="card" style="padding:10px 12px;margin-bottom:10px;">
+          <div class="row" style="align-items:flex-end;">
+            <div style="flex:0.9">
+              <label>Kantong</label>
+              <input type="number" placeholder="0" value="${state.partingKtg}" oninput="state.partingKtg=this.value" style="margin:0;padding:8px;font-size:13.5px;font-weight:800;" />
+            </div>
+            <div style="flex:0.9">
+              <label>Berat (kg)</label>
+              <input type="number" step="0.1" placeholder="0.0" value="${state.partingKg}" oninput="state.partingKg=this.value" style="margin:0;padding:8px;font-size:13.5px;font-weight:800;" />
+            </div>
+            <button class="btn btn-blue" style="flex:0 0 92px;padding:9px 6px;font-size:12px;" onclick="addPartingCart()">+ List</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding:10px 12px;margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong style="font-size:12.5px;">List Barang Stok (${state.partingCart.length} item)</strong>
+            ${state.partingCart.length ? `<button style="border:0;background:transparent;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;" onclick="state.partingCart=[];render()">Kosongkan</button>` : ''}
+          </div>
+          ${state.partingCart.map((pt, idx) => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid var(--border);font-size:12px;">
+              <strong>${pt.item}</strong>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span>${pt.ktg} ktg · <strong>${pt.kg} kg</strong></span>
+                <button style="border:0;background:transparent;color:var(--red);font-weight:700;cursor:pointer;" onclick="state.partingCart.splice(${idx},1);render()">✕</button>
+              </div>
+            </div>
+          `).join('') || '<div style="font-size:11.5px;color:var(--muted);padding:6px 0;">Pilih barang, isi kantong & kg, lalu klik + List.</div>'}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+            <button class="btn btn-blue" style="padding:11px 6px;font-size:11.5px;" onclick="savePartingCart('masuk')">Masuk Freezer (+)</button>
+            <button class="btn btn-red" style="padding:11px 6px;font-size:11.5px;" onclick="savePartingCart('keluar')">Keluar Stok (−)</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding:10px 12px;">
+          <strong style="font-size:12.5px;display:block;margin-bottom:6px;">Catatan Stok Hari Ini (${state.partingTodayLog.length})</strong>
+          ${state.partingTodayLog.map(p => `
+            <div style="font-size:11.5px;padding:5px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <strong>${p.item}</strong>: ${p.ktg} ktg (${p.kg} kg)
+                <span style="color:var(--subtle);font-size:10px;"> · ${p.jam}</span>
+              </div>
+              <span class="badge ${p.arah==='keluar'?'b-red':'b-blue'}">${p.arah==='keluar'?'Keluar (−)':'Masuk (+)'}</span>
+            </div>
+          `).join('') || '<div style="font-size:11px;color:var(--muted);">Belum ada catatan masuk/keluar stok hari ini.</div>'}
+        </div>
+      ` : `
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;">
+        ${state.lapakItems.map(it => {
+          const on = state.lapakItemName === it.id;
+          return `
+            <button onclick="state.lapakItemName='${it.id}';render()" style="padding:10px 4px;border-radius:10px;border:1.5px solid ${on?'var(--blue)':'var(--border)'};background:${on?'var(--blue-soft)':'#fff'};cursor:pointer;text-align:center;">
+              <div style="font-size:12px;font-weight:800;color:${on?'var(--blue)':'var(--text)'};">${it.short}</div>
+            </button>
+          `;
+        }).join('')}
+        <button onclick="state.showAddItem=!state.showAddItem;render()" style="padding:10px 4px;border-radius:10px;border:1.5px dashed var(--blue);background:var(--blue-soft);cursor:pointer;text-align:center;">
+          <div style="font-size:11.5px;font-weight:800;color:var(--blue);">+ Item</div>
+        </button>
+      </div>
+
+      ${state.showAddItem ? `
+        <div class="card" style="padding:10px;margin-bottom:8px;border-color:var(--blue-border);background:var(--blue-soft);">
+          <div class="row" style="align-items:center;">
+            <input placeholder="Nama item baru (mis: Uritan)" value="${state.newItemName}" oninput="state.newItemName=this.value" style="margin:0;background:#fff;" />
+            <select style="flex:0 0 70px;margin:0;background:#fff;" onchange="state.newItemSat=this.value">
+              <option value="kg" ${state.newItemSat==='kg'?'selected':''}>kg</option>
+              <option value="pcs" ${state.newItemSat==='pcs'?'selected':''}>pcs</option>
+            </select>
+            <button class="btn btn-blue" style="flex:0 0 70px;padding:9px;" onclick="addNewLapakItem()">Simpan</button>
+          </div>
+        </div>
+      ` : ''}
+
+      <div class="card" style="padding:10px 12px;margin-bottom:10px;">
+        <div class="row" style="align-items:flex-end;">
+          <div style="flex:0.8">
+            <label>Qty (${curItem.sat})</label>
+            <input type="number" step="0.1" value="${state.lapakKg}" oninput="state.lapakKg=Number(this.value||0)" style="margin:0;padding:8px;font-size:13.5px;font-weight:800;" />
+          </div>
+          <div style="flex:1">
+            <label>Harga/${curItem.sat} (Rp)</label>
+            <input type="number" value="${state.lapakHarga}" oninput="state.lapakHarga=Number(this.value||0)" style="margin:0;padding:8px;font-size:13px;" />
+          </div>
+          <button class="btn btn-blue" style="flex:0 0 92px;padding:9px 6px;font-size:12px;" onclick="addToPosCart()">+ Struk</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:10px 12px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <strong style="font-size:12.5px;">Struk Belanja (${state.lapakCart.length} item)</strong>
+          ${state.lapakCart.length ? `<button style="border:0;background:transparent;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;" onclick="state.lapakCart=[];render()">Kosongkan</button>` : ''}
+        </div>
+        ${state.lapakCart.map((it, idx) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid var(--border);font-size:12px;">
+            <div>
+              <strong>${it.barang}</strong>
+              <div style="font-size:10.5px;color:var(--muted);">${it.qty} ${it.satuan} × ${rp(it.harga)}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <strong>${rp(it.total)}</strong>
+              <button style="border:0;background:transparent;color:var(--red);font-weight:700;cursor:pointer;" onclick="state.lapakCart.splice(${idx},1);render()">✕</button>
+            </div>
+          </div>
+        `).join('') || '<div style="font-size:11.5px;color:var(--muted);padding:6px 0;">Struk masih kosong. Pilih barang & klik + Struk.</div>'}
+        <div style="border-top:1.5px dashed var(--border);margin-top:6px;padding-top:8px;">
+          <input placeholder="Nama Pembeli (opsional untuk Lunas, wajib utk Pinjem)" value="${state.lapakBorrowerName}" oninput="state.lapakBorrowerName=this.value" style="margin-bottom:8px;padding:7px 10px;font-size:12px;" />
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:12px;font-weight:700;color:var(--muted);">TOTAL STRUK:</span>
+            <strong style="font-size:18px;color:var(--navy);">${rp(grandTotal)}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+        <button class="btn btn-green" style="padding:13px 6px;font-size:13px;" onclick="checkoutPos('Lunas')">Bayar Lunas</button>
+        <button class="btn btn-amber" style="padding:13px 6px;font-size:13px;" onclick="checkoutPos('Nyenteng')">Nyenteng</button>
+      </div>
+
+      <div class="card" style="padding:10px 12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <strong style="font-size:12.5px;">Histori Transaksi Kasir (${state.lapakHistory.length})</strong>
+          <span style="font-size:11px;color:var(--green);font-weight:700;">Masuk: ${rp(state.uangMasukPelunasan)}</span>
+        </div>
+        ${state.lapakHistory.map(h => `
+          <div style="font-size:11.5px;padding:6px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <strong>${h.nama}</strong> <span style="color:var(--subtle);font-size:10px;">(${h.jam})</span>
+              <div style="font-size:10.5px;color:var(--muted);">${h.detail}${h.total > 0 ? ' · <strong style="color:var(--navy)">'+rp(h.total)+'</strong>' : ''}</div>
+            </div>
+            <span class="badge ${h.status==='Lunas'?'b-green':(h.status==='Pinjem'?'b-amber':'b-blue')}">${h.status}</span>
+          </div>
+        `).join('')}
+      </div>
+      `}
+    `;
+    return;
+  }
+
+  // 7. BELUM BAYAR (BON KANDANG + NYENTENG LAPAK) — PAK ASEP / KASIR LAPAK
+  if (state.tab === 'nyenteng') {
+    const belumBons = state.bonSavedList.map((b, i) => ({ b, i })).filter(x => x.b.status === 'Belum Bayar');
+    c.innerHTML = `
+      <h2>Belum Bayar & Pelunasan</h2>
+      <div class="card" style="background:var(--navy);color:#fff;padding:10px 14px;margin-bottom:10px;">
+        <div style="font-size:11px;color:var(--subtle);">Total Uang Masuk Pelunasan Hari Ini:</div>
+        <div style="font-size:17px;font-weight:800;color:#4ADE80;margin-top:2px;">${rp(state.uangMasukPelunasan)}</div>
+      </div>
+
+      <div class="seg">
+        <button class="${state.belumBayarSubTab==='bon'?'on':''}" onclick="state.belumBayarSubTab='bon';render()">📦 Bon Kandang (${belumBons.length})</button>
+        <button class="${state.belumBayarSubTab==='nyenteng'?'on':''}" onclick="state.belumBayarSubTab='nyenteng';render()">⏳ Nyenteng Lapak (${state.nyentengList.length})</button>
+      </div>
+
+      ${state.belumBayarSubTab === 'bon' ? (
+        belumBons.map(({ b, i }) => {
+          const sudah = Number(b.sudahBayar || 0);
+          const sisaTagihan = Math.max(0, b.total - sudah);
+          const bayar = Number(b.bayarInput || 0);
+          const selisih = Math.max(0, sisaTagihan - bayar);
+          const isPartial = bayar > 0 && bayar < sisaTagihan;
+          return `
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <strong style="font-size:13.5px;">${b.id} · ${b.pedagang}</strong>
+                <span class="badge b-blue">1 Bon = 1 Tagihan</span>
+              </div>
+              <div style="font-size:11.5px;color:var(--muted);margin-bottom:6px;">${b.tgl} (${b.shift}) · ${b.kg} kg · ${b.ekor} ekor</div>
+              <div style="font-size:12px;margin-bottom:8px;">
+                <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Total Tagihan Bon:</span><strong>${rp(b.total)}</strong></div>
+                ${sudah > 0 ? `
+                  <div style="display:flex;justify-content:space-between;color:var(--green);"><span>Sudah Dibayar:</span><strong>− ${rp(sudah)}</strong></div>
+                  <div style="display:flex;justify-content:space-between;color:var(--red);font-size:13px;"><span>Sisa Tagihan:</span><strong>${rp(sisaTagihan)}</strong></div>
+                ` : ''}
+              </div>
+              <div class="row">
+                <div>
+                  <label>Uang Masuk (Rp)</label>
+                  <input type="number" value="${b.bayarInput}" onchange="state.bonSavedList[${i}].bayarInput=Number(this.value||0);render()" />
+                </div>
+                <div style="flex:0 0 105px;">
+                  <label>Metode</label>
+                  <select onchange="state.bonSavedList[${i}].metode=this.value">
+                    <option value="Tunai" ${b.metode==='Tunai'?'selected':''}>Tunai</option>
+                    <option value="Transfer" ${b.metode==='Transfer'?'selected':''}>Transfer</option>
+                  </select>
+                </div>
+              </div>
+              ${isPartial ? `
+                <button class="btn btn-blue" style="margin-bottom:6px;" onclick="cicilBon(${i})">Bayar Sebagian (${rp(bayar)})</button>
+                <button class="btn btn-amber" style="padding:8px;font-size:11px;" onclick="lunasiBon(${i})">Atau Anggap Lunas + Diskon Owner ${rp(selisih)}</button>
+              ` : `
+                <button class="btn btn-green" onclick="lunasiBon(${i})">✓ Lunasi (${b.metode}) · ${rp(bayar)}</button>
+              `}
+            </div>
+          `;
+        }).join('') || '<div class="card">Semua bon kandang sudah lunas!</div>'
+      ) : (
+        state.nyentengList.map((n, idx) => {
+        const calcTot = n.items.reduce((s, it) => s + Math.round(it.qty * Number(it.harga || 0)), 0);
+        n.totalTagihan = calcTot;
+        const sudah = Number(n.sudahBayar || 0);
+        const sisaTagihan = Math.max(0, calcTot - sudah);
+        const bayar = Number(n.bayarInput || 0);
+        const selisihNy = Math.max(0, sisaTagihan - bayar);
+        const isPartial = calcTot > 0 && bayar > 0 && bayar < sisaTagihan;
+        return `
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <div>
+                <strong style="font-size:13.5px;">${n.nama}</strong>
+                <div style="font-size:10px;color:${(n.tglAmbil||'').includes('Kemarin')?'var(--red)':'var(--muted)'};font-weight:700;">Ambil: ${n.tglAmbil || '15 Nov (Hari ini)'}</div>
+              </div>
+              <span class="badge b-amber">${n.tipe}</span>
+            </div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:11.5px;">
+              ${n.items.map((it, iIdx) => `
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;padding:4px 0;${iIdx>0?'border-top:1px solid var(--border);':''}">
+                  <div style="flex:1;">
+                    <strong>${it.barang}</strong>: ${it.riwayat} ${it.satuan}
+                    <div style="font-size:10px;color:var(--muted);">Total: ${it.qty} ${it.satuan} · ${rp(it.qty * Number(it.harga || 0))}</div>
+                  </div>
+                  <div style="flex:0 0 92px;">
+                    <input type="number" placeholder="Harga/${it.satuan}" value="${it.harga || ''}" style="margin:0;padding:5px 7px;font-size:11.5px;background:#fff;" onchange="updateNyItemHarga(${idx},${iIdx},this.value)" />
+                  </div>
+                </div>
+              `).join('')}
+              ${n.catatan ? `<div style="font-size:11px;color:var(--blue);margin-top:4px;">Ket: ${n.catatan}</div>` : ''}
+            </div>
+            <div style="font-size:12px;margin-bottom:8px;">
+              <div style="display:flex;justify-content:space-between;">
+                <span style="color:var(--muted);">Total Tagihan:</span>
+                <strong>${rp(calcTot)}</strong>
+              </div>
+              ${sudah > 0 ? `
+                <div style="display:flex;justify-content:space-between;color:var(--green);margin-top:2px;">
+                  <span>Sudah Dibayar / Cicil:</span>
+                  <strong>− ${rp(sudah)}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;color:var(--red);margin-top:2px;font-size:13px;">
+                  <span>Sisa Tagihan:</span>
+                  <strong>${rp(sisaTagihan)}</strong>
+                </div>
+              ` : ''}
+            </div>
+            <div class="row">
+              <div>
+                <label>Uang Masuk (Rp)</label>
+                <input type="number" value="${n.bayarInput}" onchange="state.nyentengList[${idx}].bayarInput=Number(this.value||0);render()" />
+              </div>
+              <div style="flex:0 0 100px;">
+                <label>Metode</label>
+                <select onchange="state.nyentengList[${idx}].metode=this.value">
+                  <option value="Tunai" ${n.metode==='Tunai'?'selected':''}>Tunai</option>
+                  <option value="Transfer" ${n.metode==='Transfer'?'selected':''}>Transfer</option>
+                </select>
+              </div>
+            </div>
+            <div class="row" style="margin-bottom:${isPartial?'6px':'0'};">
+              <button class="btn btn-soft" style="flex:0 0 104px;font-size:11.5px;" onclick="state.lapakBorrowerName='${n.nama}';state.tab='lapak';render()">+ Ambil Lagi</button>
+              ${isPartial ? `
+                <button class="btn btn-blue" onclick="cicilNyenteng(${idx})">Bayar Sebagian (${rp(bayar)})</button>
+              ` : `
+                <button class="btn btn-green" onclick="lunasiNyenteng(${idx})">✓ Lunasi (${n.metode}) · ${rp(bayar)}</button>
+              `}
+            </div>
+            ${isPartial ? `
+              <button class="btn btn-amber" style="padding:8px;font-size:11px;" onclick="lunasiNyenteng(${idx})">
+                Atau Anggap Lunas + Diskon Owner ${rp(selisihNy)}
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }).join('') || '<div class="card">Semua transaksi nyenteng sudah lunas!</div>'
+      )}
+    `;
+    return;
+  }
+
+  // 8. PENGELUARAN LAPAK
+  if (state.tab === 'pengeluaran') {
+    c.innerHTML = `
+      <h2>Pengeluaran Lapak</h2>
+      ${state.pengeluaran.map(p => `
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;">
+            <strong style="font-size:13px;">${p.no} · ${p.ket}</strong>
+            <span class="badge ${p.st==='Disetujui'?'b-green':'b-amber'}">${p.st}</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin:4px 0;">${p.jam} · Dibayar dari: ${p.sumber}</div>
+          <div style="font-size:14px;font-weight:800;color:var(--red);">${rp(p.rp)}</div>
+        </div>
+      `).join('')}
+      <div class="card">
+        <label>Keperluan Baru</label><input id="expKet" placeholder="Contoh: Beli Es Batu" />
+        <label>Nominal (Rp)</label><input id="expRp" type="number" value="35000" />
+        <button class="btn btn-blue" onclick="state.pengeluaran.unshift({no:'#0'+(16+state.pengeluaran.length),ket:document.getElementById('expKet').value||'Operasional Lapak',jam:'Baru saja',sumber:'Kas Lapak',rp:Number(document.getElementById('expRp').value||0),st:'Menunggu'});toast('Pengeluaran + Foto Nota tersimpan!');render()">+ Simpan Pengeluaran</button>
+      </div>
+    `;
+    return;
+  }
+
+  // 9. KEUANGAN OWNER (PENAGIHAN BON + NYENTENG + DISKON + HUTANG PT)
+  if (state.tab === 'tagihan') {
+    const belumBons = state.bonSavedList.map((b, i) => ({ b, i })).filter(x => x.b.status === 'Belum Bayar');
+    c.innerHTML = `
+      <h2>Keuangan & Penagihan Owner</h2>
+      <div class="seg">
+        <button class="${state.tagihanSubTab==='bon'?'on':''}" onclick="state.tagihanSubTab='bon';render()">Tagih Bon (${belumBons.length})</button>
+        <button class="${state.tagihanSubTab==='pt'?'on':''}" onclick="state.tagihanSubTab='pt';render()">Hutang PT & Diskon</button>
+      </div>
+
+      ${state.tagihanSubTab === 'bon' ? `
+        <div class="card" style="background:var(--navy);color:#fff;padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;color:var(--subtle);">Uang Masuk Penagihan:</span>
+          <strong style="font-size:16px;color:#4ADE80;">${rp(state.uangMasukPelunasan)}</strong>
+        </div>
+        <input placeholder="Cari nama pedagang atau no. bon..." value="${state.ownerTagihSearch}" oninput="state.ownerTagihSearch=this.value;render()" style="background:#fff;margin-bottom:10px;" />
+        ${belumBons.filter(({b}) => (b.pedagang + ' ' + b.id).toLowerCase().includes(state.ownerTagihSearch.toLowerCase())).map(({ b, i }) => {
+          const sudah = Number(b.sudahBayar || 0);
+          const sisaTagihan = Math.max(0, b.total - sudah);
+          const bayar = Number(b.bayarInput || 0);
+          const selisih = Math.max(0, sisaTagihan - bayar);
+          const isPartial = bayar > 0 && bayar < sisaTagihan;
+          const open = state.ownerExpandedBonId === b.id;
+          return `
+            <div class="card" style="padding:10px 12px;margin-bottom:8px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="state.ownerExpandedBonId=state.ownerExpandedBonId==='${b.id}'?null:'${b.id}';render()">
+                <div>
+                  <strong style="font-size:13px;">${b.id} · ${b.pedagang}</strong>
+                  <div style="font-size:10.5px;color:var(--muted);">${b.tgl} · ${b.kg} kg · ${b.ekor} ekor</div>
+                </div>
+                <div style="text-align:right;display:flex;align-items:center;gap:8px;">
+                  <div>
+                    <div style="font-size:12.5px;font-weight:800;color:var(--red);">${rp(sisaTagihan)}</div>
+                    ${sudah > 0 ? `<div style="font-size:9.5px;color:var(--green);">Cicil: ${rp(sudah)}</div>` : ''}
+                  </div>
+                  <span class="badge ${open?'b-blue':'b-gray'}">${open?'Tutup ▴':'Tagih ▾'}</span>
+                </div>
+              </div>
+              ${open ? `
+                <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+                  <div class="row">
+                    <div>
+                      <label>Uang Masuk (Rp)</label>
+                      <input type="number" value="${b.bayarInput}" onchange="state.bonSavedList[${i}].bayarInput=Number(this.value||0);render()" />
+                    </div>
+                    <div style="flex:0 0 100px;">
+                      <label>Metode</label>
+                      <select onchange="state.bonSavedList[${i}].metode=this.value">
+                        <option value="Tunai" ${b.metode==='Tunai'?'selected':''}>Tunai</option>
+                        <option value="Transfer" ${b.metode==='Transfer'?'selected':''}>Transfer</option>
+                      </select>
+                    </div>
+                  </div>
+                  ${isPartial ? `
+                    <button class="btn btn-blue" style="margin-bottom:6px;padding:9px;font-size:12px;" onclick="cicilBon(${i})">Bayar Sebagian (${rp(bayar)})</button>
+                    <button class="btn btn-amber" style="padding:7px;font-size:11px;" onclick="lunasiBon(${i})">Anggap Lunas + Diskon ${rp(selisih)}</button>
+                  ` : `
+                    <button class="btn btn-green" style="padding:9px;font-size:12px;" onclick="lunasiBon(${i})">✓ Lunasi (${b.metode}) · ${rp(bayar)}</button>
+                  `}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('') || '<div class="card">Tidak ada bon yang cocok / semua sudah lunas!</div>'}
+      ` : `
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <strong style="font-size:13px;">Input Harga Beli PT (Owner)</strong>
+            <input type="date" value="${state.ptBeliTanggal}" onchange="state.ptBeliTanggal=this.value;render()" style="width:auto;margin:0;padding:4px 8px;font-size:11.5px;" />
+          </div>
+          <div class="row">
+            <div>
+              <label>PT 1 · FUSO (${state.ptKgFuso.toLocaleString('id-ID')} kg)</label>
+              <input type="number" id="inFusoKeu" value="${state.ptModalFuso}" style="margin-bottom:6px;" />
+            </div>
+            <div>
+              <label>PT 2 · L300 (${state.ptKgL300.toLocaleString('id-ID')} kg)</label>
+              <input type="number" id="inL300Keu" value="${state.ptModalL300}" style="margin-bottom:6px;" />
+            </div>
+          </div>
+          <button class="btn btn-blue" style="padding:9px;font-size:12px;" onclick="saveHargaBeliPt()">Simpan Pembelian (${state.ptBeliTanggal})</button>
+        </div>
+        <div class="card">
+          <div style="font-size:12.5px;font-weight:700;">Total Diskon / Cashback Diberikan</div>
+          <div style="font-size:14px;font-weight:800;color:var(--amber);margin-top:4px;">${rp(state.totalDiskonBulan)} (dari ${state.totalBonDiskon} bon)</div>
+        </div>
+        <strong style="font-size:13px;display:block;margin:10px 0 8px;">Rekap Pembelian & Hutang PT per Tanggal</strong>
+        ${state.ptPurchaseHistory.map((ph, idx) => `
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <strong style="font-size:13px;">${ph.tgl}</strong>
+              <span class="badge ${ph.lunas?'b-green':'b-red'}">${ph.lunas?'Lunas ke PT':'Belum Bayar'}</span>
+            </div>
+            <div style="font-size:11.5px;color:var(--muted);">• FUSO (${ph.fusoKg.toLocaleString('id-ID')} kg × ${rp(ph.fusoHarga)}): <strong>${rp(ph.fusoKg * ph.fusoHarga)}</strong></div>
+            <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">• L300 (${ph.l300Kg.toLocaleString('id-ID')} kg × ${rp(ph.l300Harga)}): <strong>${rp(ph.l300Kg * ph.l300Harga)}</strong></div>
+            <div style="font-size:13.5px;font-weight:800;margin-top:6px;color:var(--navy);">Total Pembelian: ${rp(ph.total)}</div>
+            ${!ph.lunas ? `<button class="btn btn-soft" style="margin-top:8px;padding:7px;font-size:11.5px;" onclick="state.ptPurchaseHistory[${idx}].lunas=true;toast('✓ Pembelian tgl ${ph.tgl} ditandai Lunas ke PT!');render()">✓ Tandai Sudah Bayar ke PT</button>` : ''}
+          </div>
+        `).join('')}
+      `}
+    `;
+  }
+}
+
+render();
+</script>
+</body>
+</html>
