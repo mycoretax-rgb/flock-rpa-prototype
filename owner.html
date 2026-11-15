@@ -1041,7 +1041,7 @@ function renderNav() {
   const menus = {
     owner: [
       { id: 'home', ico: ICO.home, lbl: 'Beranda' },
-      { id: 'pt', ico: ICO.box, lbl: 'Masuk PT' },
+      { id: 'pt', ico: ICO.box, lbl: 'Masuk DO' },
       { id: 'kandang', ico: ICO.grid, lbl: 'Kandang' },
       { id: 'tagihan', ico: ICO.receipt, lbl: 'Keuangan' },
     ],
@@ -1182,7 +1182,7 @@ function render() {
         <div style="font-size:24px;font-weight:800;letter-spacing:-0.03em;margin:6px 0 8px;">${rp(estProfit)}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10.5px;color:var(--subtle);border-top:1px solid #334155;padding-top:8px;">
           <div>Omzet: <strong style="color:#fff;">${rp(tl.omzet)}</strong></div>
-          <div>Modal PT: <strong style="color:#fff;">${rp(tl.modal)}</strong></div>
+          <div>Modal DO: <strong style="color:#fff;">${rp(tl.modal)}</strong></div>
           <div>Biaya Ops: <strong style="color:#FCA5A5;">−${rp(tl.biaya)}</strong></div>
           <div>Diskon: <strong style="color:#FCD34D;">−${rp(tl.diskon)}</strong></div>
         </div>
@@ -1248,7 +1248,7 @@ function render() {
         </table>
       </div>
       <div class="card">
-        <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Dokumen Masuk PT (Dari Admin)</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Dokumen Masuk DO (Dari Admin)</div>
         ${state.ptSavedList.map((item, idx) => `
           <div style="padding:8px 0;${idx < state.ptSavedList.length - 1 ? 'border-bottom:1px solid var(--border);' : ''}">
             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -1289,10 +1289,10 @@ function render() {
     const tuOtomatis = Math.max(0, totEk - obEk - doaEk);
     const invalid = totEk > 0 && (obEk + doaEk > totEk);
     c.innerHTML = `
-      <h2>Dokumen Masuk PT <span class="badge b-gray">Modal Owner</span></h2>
+      <h2>Dokumen Masuk DO <span class="badge b-gray">Modal Owner</span></h2>
       <div class="card">
         <div class="row">
-          <div><label>Nama PT / Farm</label><input placeholder="Contoh: PT. Sido Mukti" value="${f.ptName}" oninput="state.ptForm.ptName=this.value" /></div>
+          <div><label>Nama DO / Farm</label><input placeholder="Contoh: PT. Sido Mukti" value="${f.ptName}" oninput="state.ptForm.ptName=this.value" /></div>
           <div style="flex:0 0 110px"><label>No. DO / SPPA</label><input placeholder="000103" value="${f.noDo}" oninput="state.ptForm.noDo=this.value" /></div>
         </div>
         <div class="row">
@@ -1337,13 +1337,13 @@ function render() {
         </div>
       </div>
       <div class="card">
-        <label>Upload Foto Dokumen PT (Untuk Dicek Owner)</label>
+        <label>Upload Foto Dokumen DO (Untuk Dicek Owner)</label>
         <input type="file" accept="image/*" style="background:#fff;padding:7px;" onchange="handlePtPhoto(this)" />
         ${f.fotoName ? `<div style="font-size:11.5px;color:var(--green);font-weight:600;">✓ Terpilih: ${f.fotoName}</div>` : `<div style="font-size:11px;color:var(--muted);">Pastikan foto dokumen tidak blur agar mudah dicek Owner.</div>`}
       </div>
       <div class="row" style="margin-bottom:14px;">
         ${state.ptEditingIdx !== null ? `<button class="btn btn-soft" onclick="cancelEditPt()">Batal Edit</button>` : ''}
-        <button class="btn btn-blue" onclick="savePtDoc()">${state.ptEditingIdx !== null ? 'Simpan Perubahan Data' : 'Simpan Dokumen Masuk PT'}</button>
+        <button class="btn btn-blue" onclick="savePtDoc()">${state.ptEditingIdx !== null ? 'Simpan Perubahan Data' : 'Simpan Dokumen Masuk DO'}</button>
       </div>
 
       <strong style="font-size:13px;display:block;margin-bottom:8px;">Sudah Berhasil Diinput Hari Ini (${state.ptSavedList.length})</strong>
@@ -1975,7 +1975,7 @@ function render() {
       <h2>Keuangan & Penagihan Owner</h2>
       <div class="seg">
         <button class="${state.tagihanSubTab==='bon'?'on':''}" onclick="state.tagihanSubTab='bon';render()">Tagih Bon (${belumBons.length})</button>
-        <button class="${state.tagihanSubTab==='pt'?'on':''}" onclick="state.tagihanSubTab='pt';render()">Hutang PT & Diskon</button>
+        <button class="${state.tagihanSubTab==='pt'?'on':''}" onclick="state.tagihanSubTab='pt';render()">Hutang DO & Diskon</button>
       </div>
 
       ${state.tagihanSubTab === 'bon' ? `
@@ -2035,16 +2035,16 @@ function render() {
       ` : `
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-            <strong style="font-size:13px;">Input Harga Beli PT (Owner)</strong>
+            <strong style="font-size:13px;">Input Harga Beli DO (Owner)</strong>
             <input type="date" value="${state.ptBeliTanggal}" onchange="state.ptBeliTanggal=this.value;render()" style="width:auto;margin:0;padding:4px 8px;font-size:11.5px;" />
           </div>
           <div class="row">
             <div>
-              <label>PT 1 · FUSO (${state.ptKgFuso.toLocaleString('id-ID')} kg)</label>
+              <label>DO 1 · FUSO (${state.ptKgFuso.toLocaleString('id-ID')} kg)</label>
               <input type="number" id="inFusoKeu" value="${state.ptModalFuso}" style="margin-bottom:6px;" />
             </div>
             <div>
-              <label>PT 2 · L300 (${state.ptKgL300.toLocaleString('id-ID')} kg)</label>
+              <label>DO 2 · L300 (${state.ptKgL300.toLocaleString('id-ID')} kg)</label>
               <input type="number" id="inL300Keu" value="${state.ptModalL300}" style="margin-bottom:6px;" />
             </div>
           </div>
@@ -2054,17 +2054,17 @@ function render() {
           <div style="font-size:12.5px;font-weight:700;">Total Diskon / Cashback Diberikan</div>
           <div style="font-size:14px;font-weight:800;color:var(--amber);margin-top:4px;">${rp(state.totalDiskonBulan)} (dari ${state.totalBonDiskon} bon)</div>
         </div>
-        <strong style="font-size:13px;display:block;margin:10px 0 8px;">Rekap Pembelian & Hutang PT per Tanggal</strong>
+        <strong style="font-size:13px;display:block;margin:10px 0 8px;">Rekap Pembelian & Hutang DO per Tanggal</strong>
         ${state.ptPurchaseHistory.map((ph, idx) => `
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
               <strong style="font-size:13px;">${ph.tgl}</strong>
-              <span class="badge ${ph.lunas?'b-green':'b-red'}">${ph.lunas?'Lunas ke PT':'Belum Bayar'}</span>
+              <span class="badge ${ph.lunas?'b-green':'b-red'}">${ph.lunas?'Lunas ke DO':'Belum Bayar'}</span>
             </div>
             <div style="font-size:11.5px;color:var(--muted);">• FUSO (${ph.fusoKg.toLocaleString('id-ID')} kg × ${rp(ph.fusoHarga)}): <strong>${rp(ph.fusoKg * ph.fusoHarga)}</strong></div>
             <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">• L300 (${ph.l300Kg.toLocaleString('id-ID')} kg × ${rp(ph.l300Harga)}): <strong>${rp(ph.l300Kg * ph.l300Harga)}</strong></div>
             <div style="font-size:13.5px;font-weight:800;margin-top:6px;color:var(--navy);">Total Pembelian: ${rp(ph.total)}</div>
-            ${!ph.lunas ? `<button class="btn btn-soft" style="margin-top:8px;padding:7px;font-size:11.5px;" onclick="state.ptPurchaseHistory[${idx}].lunas=true;toast('✓ Pembelian tgl ${ph.tgl} ditandai Lunas ke PT!');render()">✓ Tandai Sudah Bayar ke PT</button>` : ''}
+            ${!ph.lunas ? `<button class="btn btn-soft" style="margin-top:8px;padding:7px;font-size:11.5px;" onclick="state.ptPurchaseHistory[${idx}].lunas=true;toast('✓ Pembelian tgl ${ph.tgl} ditandai Lunas ke DO!');render()">✓ Tandai Sudah Bayar ke DO</button>` : ''}
           </div>
         `).join('')}
       `}
