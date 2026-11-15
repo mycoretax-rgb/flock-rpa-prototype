@@ -1104,6 +1104,7 @@ function renderNav() {
       { id: 'home', ico: ICO.home, lbl: 'Beranda' },
       { id: 'pt', ico: ICO.box, lbl: 'Masuk DO' },
       { id: 'kandang', ico: ICO.grid, lbl: 'Kandang' },
+      { id: 'bon', ico: ICO.file, lbl: 'Input Bon' },
       { id: 'tagihan', ico: ICO.receipt, lbl: 'Keuangan' },
     ],
     admin: [
@@ -1229,7 +1230,7 @@ function render() {
     }[state.ownerTimeline];
     const estProfit = tl.omzet - tl.modal - tl.biaya - tl.diskon;
     c.innerHTML = `
-      <h2>Ringkasan Owner</h2>
+      <h2>Ringkasan Owner <button style="border:1px solid var(--border);background:#fff;color:var(--blue);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;" onclick="state.tab='lapak';render()">Mode Kasir Lapak →</button></h2>
       <div class="seg" style="margin-bottom:10px;">
         ${['Harian','Mingguan','Bulanan'].map(t => `
           <button class="${state.ownerTimeline===t?'on':''}" onclick="state.ownerTimeline='${t}';render()">${t}</button>
