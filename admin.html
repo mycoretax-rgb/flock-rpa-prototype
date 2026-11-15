@@ -878,10 +878,23 @@ function lunasiBon(idx) {
   render();
 }
 
-function saveBonEntry(tot) {
-  const kg = Number(state.bonKg || 0);
+function updateBonKg(val) {
+  state.bonKg = val;
+  updateBonTotalPreview();
+}
+
+function updateBonTotalPreview() {
+  const kg = parseFloat(String(state.bonKg || '0').replace(',', '.')) || 0;
+  const hg = Number(state.bonHarga || 0);
+  const el = document.getElementById('bonTotalPreview');
+  if (el) el.textContent = rp(Math.round(kg * hg));
+}
+
+function saveBonEntry() {
+  const kg = parseFloat(String(state.bonKg || '0').replace(',', '.')) || 0;
   const ekor = Number(state.bonEkor || 0);
   const harga = Number(state.bonHarga || 0);
+  const tot = Math.round(kg * harga);
   if (!kg || !harga) { toast('Isi Timbangan (kg) & Harga /kg dulu!'); return; }
   if (!state.pedagangDone.includes(state.pedagangSelected)) {
     state.pedagangDone.push(state.pedagangSelected);
@@ -1571,7 +1584,7 @@ function render() {
   // 5. INPUT BON ADMIN (Gaya Rekap Jual - Al Amin: Shift + Chip Pedagang + Timbangan/Ekor/Harga + Ringkasan)
   if (state.tab === 'bon') {
     const filtered = state.pedagangList.filter(n => n.toLowerCase().includes(state.pedagangSearch.toLowerCase()));
-    const kg = Number(state.bonKg || 0);
+    const kg = parseFloat(String(state.bonKg || '0').replace(',', '.')) || 0;
     const hg = Number(state.bonHarga || 0);
     const tot = Math.round(kg * hg);
     c.innerHTML = `
@@ -1605,20 +1618,20 @@ function render() {
           <input type="date" value="${state.bonTanggal}" oninput="state.bonTanggal=this.value" style="width:auto;margin:0;padding:4px 8px;font-size:11.5px;" />
         </div>
         <div class="row">
-          <div><label>Timbangan (kg)</label><input type="number" step="0.01" value="${state.bonKg}" oninput="state.bonKg=this.value;render()" /></div>
-          <div><label>Ekor</label><input type="number" value="${state.bonEkor}" oninput="state.bonEkor=this.value;render()" /></div>
+          <div><label>Timbangan (kg · bisa 2 desimal)</label><input type="text" inputmode="decimal" placeholder="32.45" value="${state.bonKg}" oninput="updateBonKg(this.value)" /></div>
+          <div><label>Ekor</label><input type="number" value="${state.bonEkor}" oninput="state.bonEkor=this.value" /></div>
         </div>
         <label>Harga /kg (Rp)</label>
-        <input type="number" value="${state.bonHarga}" oninput="state.bonHarga=this.value;render()" />
+        <input type="number" value="${state.bonHarga}" oninput="state.bonHarga=this.value;updateBonTotalPreview()" />
         <label>Catatan (boleh kosong)</label>
         <input placeholder="mis: DG 33, Plet 8, ATI 40 · bon 2 lembar…" value="${state.bonNote}" oninput="state.bonNote=this.value" />
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--blue-soft);border-radius:8px;margin-bottom:10px;">
           <span style="font-size:11.5px;font-weight:700;color:var(--blue);">Total Tagihan Bon:</span>
-          <strong style="font-size:15px;color:var(--navy);">${rp(tot)}</strong>
+          <strong id="bonTotalPreview" style="font-size:15px;color:var(--navy);">${rp(tot)}</strong>
         </div>
         <div class="row">
           <button class="btn btn-navy" onclick="toast('Struk thermal dicetak!')">Thermal</button>
-          <button class="btn btn-blue" onclick="saveBonEntry(${tot})">SIMPAN BON</button>
+          <button class="btn btn-blue" onclick="saveBonEntry()">SIMPAN BON</button>
         </div>
       </div>
       <div class="card" style="background:var(--navy);color:#fff;padding:12px 14px;">
