@@ -350,8 +350,8 @@ const state = {
   ptKgL300: 1417.4,
   ptBeliTanggal: '2026-11-15',
   ptPurchaseHistory: [
-    { tgl: '2026-11-15', fusoKg: 2718.0, fusoHarga: 21500, l300Kg: 1417.4, l300Harga: 22200, total: 89903280, lunas: false },
-    { tgl: '2026-11-14', fusoKg: 2540.0, fusoHarga: 21300, l300Kg: 1320.0, l300Harga: 22000, total: 83142000, lunas: true }
+    { tgl: '2026-11-15', fusoKg: 2718.0, fusoHarga: 21500, l300Kg: 1417.4, l300Harga: 22200, total: 89903280, sudahBayar: 50000000, bayarInput: 39903280, lunas: false },
+    { tgl: '2026-11-14', fusoKg: 2540.0, fusoHarga: 21300, l300Kg: 1320.0, l300Harga: 22000, total: 83142000, sudahBayar: 83142000, bayarInput: 0, lunas: true }
   ],
   ptForm: {
     ptName: 'PT. Sido Mukti Mandiri',
@@ -559,10 +559,28 @@ function saveHargaBeliPt() {
       l300Kg: state.ptKgL300,
       l300Harga: lHarga,
       total: tot,
+      sudahBayar: 0,
+      bayarInput: tot,
       lunas: false
     });
   }
   toast('✓ Pembelian tgl ' + state.ptBeliTanggal + ' (' + rp(tot) + ') tersimpan!');
+  render();
+}
+
+function bayarSupplier(idx) {
+  const ph = state.ptPurchaseHistory[idx];
+  const nominal = Number(ph.bayarInput || 0);
+  if (!nominal) { toast('Isi nominal bayar supplier dulu!'); return; }
+  ph.sudahBayar = Number(ph.sudahBayar || 0) + nominal;
+  const sisa = Math.max(0, ph.total - ph.sudahBayar);
+  ph.bayarInput = sisa;
+  if (sisa === 0) {
+    ph.lunas = true;
+    toast('✓ Tagihan supplier tgl ' + ph.tgl + ' Lunas!');
+  } else {
+    toast('✓ Dibayar sebagian ' + rp(nominal) + '! Sisa pending: ' + rp(sisa));
+  }
   render();
 }
 
@@ -2055,18 +2073,40 @@ function render() {
           <div style="font-size:14px;font-weight:800;color:var(--amber);margin-top:4px;">${rp(state.totalDiskonBulan)} (dari ${state.totalBonDiskon} bon)</div>
         </div>
         <strong style="font-size:13px;display:block;margin:10px 0 8px;">Rekap Tagihan Supplier per Tanggal</strong>
-        ${state.ptPurchaseHistory.map((ph, idx) => `
-          <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-              <strong style="font-size:13px;">${ph.tgl}</strong>
-              <span class="badge ${ph.lunas?'b-green':'b-red'}">${ph.lunas?'Lunas ke Supplier':'Belum Bayar'}</span>
+        ${state.ptPurchaseHistory.map((ph, idx) => {
+          const sudah = Number(ph.sudahBayar || 0);
+          const sisaSup = Math.max(0, ph.total - sudah);
+          const inp = Number(ph.bayarInput || 0);
+          const stBadge = ph.lunas ? ['b-green', 'Lunas ke Supplier'] : (sudah > 0 ? ['b-amber', 'Cicil / Pending'] : ['b-red', 'Belum Bayar']);
+          return `
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <strong style="font-size:13px;">${ph.tgl}</strong>
+                <span class="badge ${stBadge[0]}">${stBadge[1]}</span>
+              </div>
+              <div style="font-size:11.5px;color:var(--muted);">• FUSO (${ph.fusoKg.toLocaleString('id-ID')} kg × ${rp(ph.fusoHarga)}): <strong>${rp(ph.fusoKg * ph.fusoHarga)}</strong></div>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">• L300 (${ph.l300Kg.toLocaleString('id-ID')} kg × ${rp(ph.l300Harga)}): <strong>${rp(ph.l300Kg * ph.l300Harga)}</strong></div>
+              <div style="font-size:12px;margin-top:6px;padding-top:6px;border-top:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Total Tagihan:</span><strong>${rp(ph.total)}</strong></div>
+                ${!ph.lunas ? `
+                  <div style="display:flex;justify-content:space-between;color:var(--green);margin-top:2px;"><span>Sudah Dibayar:</span><strong>${rp(sudah)}</strong></div>
+                  <div style="display:flex;justify-content:space-between;color:var(--red);margin-top:2px;font-size:13px;"><span>Sisa Pending:</span><strong>${rp(sisaSup)}</strong></div>
+                ` : ''}
+              </div>
+              ${!ph.lunas ? `
+                <div class="row" style="margin-top:8px;align-items:flex-end;">
+                  <div>
+                    <label>Bayar ke Supplier (Rp)</label>
+                    <input type="number" value="${ph.bayarInput}" style="margin:0;" onchange="state.ptPurchaseHistory[${idx}].bayarInput=Number(this.value||0);render()" />
+                  </div>
+                  <button class="btn ${inp < sisaSup ? 'btn-blue' : 'btn-green'}" style="flex:0 0 132px;padding:9px 8px;font-size:11.5px;" onclick="bayarSupplier(${idx})">
+                    ${inp < sisaSup ? 'Bayar Sebagian' : '✓ Lunasi'}
+                  </button>
+                </div>
+              ` : ''}
             </div>
-            <div style="font-size:11.5px;color:var(--muted);">• FUSO (${ph.fusoKg.toLocaleString('id-ID')} kg × ${rp(ph.fusoHarga)}): <strong>${rp(ph.fusoKg * ph.fusoHarga)}</strong></div>
-            <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">• L300 (${ph.l300Kg.toLocaleString('id-ID')} kg × ${rp(ph.l300Harga)}): <strong>${rp(ph.l300Kg * ph.l300Harga)}</strong></div>
-            <div style="font-size:13.5px;font-weight:800;margin-top:6px;color:var(--navy);">Total Pembelian: ${rp(ph.total)}</div>
-            ${!ph.lunas ? `<button class="btn btn-soft" style="margin-top:8px;padding:7px;font-size:11.5px;" onclick="state.ptPurchaseHistory[${idx}].lunas=true;toast('✓ Pembelian tgl ${ph.tgl} ditandai Lunas ke Supplier!');render()">✓ Tandai Sudah Bayar Supplier</button>` : ''}
-          </div>
-        `).join('')}
+          `;
+        }).join('')}
       `}
     `;
   }
