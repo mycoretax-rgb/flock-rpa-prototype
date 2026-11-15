@@ -878,6 +878,32 @@ function lunasiBon(idx) {
   render();
 }
 
+function editBonRow(idx) {
+  const b = state.bonSavedList[idx];
+  state.pedagangSelected = b.pedagang;
+  state.bonTanggal = b.tgl;
+  state.bonJalur = b.jalur || 'TU';
+  state.bonEkor = String(b.ekor || '');
+  state.bonKg = String(b.kg || '');
+  state.bonHarga = String(b.harga || '');
+  state.bonNote = b.note || '';
+  state.bonSavedList.splice(idx, 1);
+  toast('Mode Koreksi: ubah angka lalu klik SIMPAN BON.');
+  render();
+  document.getElementById('appContent').scrollTop = 0;
+}
+
+function batalBonRow(idx) {
+  const b = state.bonSavedList[idx];
+  state.bonEntriesCount = Math.max(0, state.bonEntriesCount - 1);
+  state.bonEntriesKg = Math.max(0, state.bonEntriesKg - Number(b.kg || 0));
+  state.bonEntriesEkor = Math.max(0, state.bonEntriesEkor - Number(b.ekor || 0));
+  state.bonEntriesRp = Math.max(0, state.bonEntriesRp - Number(b.total || 0));
+  state.bonSavedList.splice(idx, 1);
+  toast('Entri ' + b.pedagang + ' (' + b.kg + ' kg) dibatalkan.');
+  render();
+}
+
 function updateBonKg(val) {
   state.bonKg = val;
   updateBonTotalPreview();
@@ -1646,17 +1672,62 @@ function render() {
         <div style="font-size:11px;color:var(--subtle);">Ringkasan (${state.bonTanggal} · ${state.shift}):</div>
         <div style="font-size:12.5px;font-weight:700;margin-top:3px;">${state.bonEntriesCount} entri · ${state.bonEntriesKg.toLocaleString('id-ID')} kg · ${state.bonEntriesEkor} ekr · ${rp(state.bonEntriesRp)}</div>
       </div>
-      <strong style="font-size:13px;display:block;margin:12px 0 8px;">Rekapan Bon Sudah Diinput (${state.bonSavedList.length})</strong>
-      ${state.bonSavedList.map(b => `
-        <div class="card" style="padding:11px 13px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <strong style="font-size:13px;">${b.pedagang} <span class="badge ${b.jalur==='OB'?'b-blue':'b-green'}" style="margin-left:4px;">${b.jalur || 'TU'}</span> <span style="font-size:10.5px;color:var(--muted);font-weight:500;">(${b.tgl} · ${b.shift})</span></strong>
-            <span class="badge ${b.status==='Lunas'?'b-green':'b-amber'}">${b.status}</span>
-          </div>
-          <div style="font-size:11.5px;color:var(--muted);">${b.kg} kg · ${b.ekor} ekor × ${rp(b.harga)} = <strong style="color:var(--navy);">${rp(b.total)}</strong></div>
-          ${b.note ? `<div style="font-size:10.5px;color:var(--blue);margin-top:3px;">Catatan: ${b.note}</div>` : ''}
-        </div>
-      `).join('')}
+      <strong style="font-size:13px;display:block;margin:12px 0 8px;">Rekapan Bon Sudah Diinput (${state.bonSavedList.length} entri)</strong>
+      <div class="card" style="padding:10px 12px;">
+        ${(() => {
+          const groups = [];
+          const map = {};
+          state.bonSavedList.forEach((b, idx) => {
+            const key = b.pedagang + '||' + b.tgl;
+            if (!map[key]) {
+              map[key] = { pedagang: b.pedagang, tgl: b.tgl, rows: [], totEkor: 0, totRp: 0 };
+              groups.push(map[key]);
+            }
+            map[key].rows.push({ b, idx });
+            map[key].totEkor += Number(b.ekor || 0);
+            map[key].totRp += Number(b.total || 0);
+          });
+          return groups.map((g, gIdx) => `
+            <div style="${gIdx > 0 ? 'border-top:1px solid var(--border);margin-top:8px;padding-top:8px;' : ''}">
+              ${g.rows.length > 1 ? `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <div><strong style="font-size:13px;">${g.pedagang}</strong> <span style="font-size:11px;color:var(--muted);">${g.rows.length} entri · ${g.totEkor} ekr</span></div>
+                  <strong style="font-size:13px;color:var(--navy);">${rp(g.totRp)}</strong>
+                </div>
+                ${g.rows.map(({ b, idx }) => `
+                  <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0 4px 10px;border-top:1px dashed var(--border);font-size:11.5px;">
+                    <div style="color:var(--muted);">
+                      — <strong style="color:var(--text);">${b.kg} kg</strong> · ${b.ekor} ekr · @${(b.harga/1000).toFixed(1).replace('.0','')}rb
+                      <span class="badge ${b.jalur==='OB'?'b-blue':'b-green'}" style="padding:1px 6px;font-size:9.5px;margin-left:3px;">${b.jalur || 'TU'}</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <strong>${rp(b.total)}</strong>
+                      <button style="border:1px solid #FDE68A;background:var(--amber-soft);color:var(--amber);border-radius:999px;width:22px;height:22px;font-size:11px;cursor:pointer;" onclick="editBonRow(${idx})">✎</button>
+                      <button style="border:1px solid var(--border);background:var(--bg);color:var(--muted);border-radius:999px;width:22px;height:22px;font-size:11px;cursor:pointer;" onclick="batalBonRow(${idx})">✕</button>
+                    </div>
+                  </div>
+                `).join('')}
+              ` : (() => {
+                const { b, idx } = g.rows[0];
+                return `
+                  <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+                    <div>
+                      <strong>${b.pedagang}</strong>
+                      <span class="badge ${b.jalur==='OB'?'b-blue':'b-green'}" style="padding:1px 6px;font-size:9.5px;margin-left:3px;">${b.jalur || 'TU'}</span>
+                      <div style="font-size:11px;color:var(--muted);">${b.kg} kg · ${b.ekor} ekr · @${(b.harga/1000).toFixed(1).replace('.0','')}rb</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <strong>${rp(b.total)}</strong>
+                      <button style="border:1px solid #FDE68A;background:var(--amber-soft);color:var(--amber);border-radius:999px;width:22px;height:22px;font-size:11px;cursor:pointer;" onclick="editBonRow(${idx})">✎</button>
+                      <button style="border:1px solid var(--border);background:var(--bg);color:var(--muted);border-radius:999px;width:22px;height:22px;font-size:11px;cursor:pointer;" onclick="batalBonRow(${idx})">✕</button>
+                    </div>
+                  </div>
+                `;
+              })()}
+            </div>
+          `).join('');
+        })()}
+      </div>
     `;
     return;
   }
