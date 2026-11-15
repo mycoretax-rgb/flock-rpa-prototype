@@ -1623,8 +1623,8 @@ function render() {
           <input type="date" value="${state.bonTanggal}" oninput="state.bonTanggal=this.value" style="width:auto;margin:0;padding:4px 8px;font-size:11.5px;" />
         </div>
         <div class="seg" style="margin-bottom:10px;">
-          <button class="${state.bonJalur==='OB'?'on':''}" onclick="state.bonJalur='OB';render()">Jalur OB (Langsung)</button>
-          <button class="${state.bonJalur==='TU'?'on':''}" onclick="state.bonJalur='TU';render()">Jalur TU (Kandang)</button>
+          <button class="${state.bonJalur==='OB'?'on':''}" onclick="state.bonJalur='OB';render()">OB</button>
+          <button class="${state.bonJalur==='TU'?'on':''}" onclick="state.bonJalur='TU';render()">TU</button>
         </div>
         <div class="row">
           <div><label>Ekor</label><input type="number" value="${state.bonEkor}" oninput="state.bonEkor=this.value" /></div>
