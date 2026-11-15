@@ -455,7 +455,7 @@ const state = {
   shift: 'MALAM',
   pedagangSearch: '',
   pedagangList: ['Indra','Ina','Aa','Encep','Dasep','Andri bebek','Anggun','Rudi','Alesa','Ule','Maul','Mang Ayi','Said','Uloh','Bu Hj','Rijal','Bu Ani','Iki','Nandi','Dori','Yanto','Idan','Aceng'],
-  showAddPedagang: false,
+  showAddPembeli: false,
   newPedagangName: '',
   pedagangSelected: 'Nandi',
   pedagangDone: ['Indra', 'Bu Hj', 'Maul'],
@@ -678,7 +678,7 @@ function savePartingCart(arah = 'masuk') {
 
 function addNewPedagang() {
   const nm = (state.newPedagangName || '').trim();
-  if (!nm) { toast('Ketik nama pedagang dulu!'); return; }
+  if (!nm) { toast('Ketik nama pembeli dulu!'); return; }
   if (!state.pedagangList.some(x => x.toLowerCase() === nm.toLowerCase())) {
     state.pedagangList.unshift(nm);
   }
@@ -1599,12 +1599,12 @@ function render() {
       </div>
       <div class="card">
         <div class="row" style="margin-bottom:8px;align-items:center;">
-          <input placeholder="Cari nama pedagang…" value="${state.pedagangSearch}" oninput="state.pedagangSearch=this.value;render()" style="margin:0;" />
-          <button class="btn btn-soft" style="flex:0 0 92px;padding:9px 6px;font-size:11.5px;border:1px solid var(--blue-border);" onclick="state.showAddPedagang=!state.showAddPedagang;render()">+ Pedagang</button>
+          <input placeholder="Cari nama pembeli…" value="${state.pedagangSearch}" oninput="state.pedagangSearch=this.value;render()" style="margin:0;" />
+          <button class="btn btn-soft" style="flex:0 0 92px;padding:9px 6px;font-size:11.5px;border:1px solid var(--blue-border);" onclick="state.showAddPedagang=!state.showAddPedagang;render()">+ Pembeli</button>
         </div>
         ${state.showAddPedagang ? `
           <div class="row" style="margin-bottom:8px;padding:8px;background:var(--blue-soft);border-radius:8px;border:1px solid var(--blue-border);">
-            <input placeholder="Ketik nama pedagang baru..." value="${state.newPedagangName}" oninput="state.newPedagangName=this.value" style="margin:0;background:#fff;" onkeydown="if(event.key==='Enter'){addNewPedagang()}" />
+            <input placeholder="Ketik nama pembeli baru..." value="${state.newPedagangName}" oninput="state.newPedagangName=this.value" style="margin:0;background:#fff;" onkeydown="if(event.key==='Enter'){addNewPedagang()}" />
             <button class="btn btn-blue" style="flex:0 0 74px;padding:9px;" onclick="addNewPedagang()">Simpan</button>
           </div>
         ` : ''}
@@ -1618,7 +1618,7 @@ function render() {
       </div>
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <span style="font-size:13px;font-weight:800;color:var(--blue);">Pedagang: ${state.pedagangSelected}</span>
+          <span style="font-size:13px;font-weight:800;color:var(--blue);">Pembeli: ${state.pedagangSelected}</span>
           <input type="date" value="${state.bonTanggal}" oninput="state.bonTanggal=this.value" style="width:auto;margin:0;padding:4px 8px;font-size:11.5px;" />
         </div>
         <div class="seg" style="margin-bottom:10px;">
@@ -2022,7 +2022,7 @@ function render() {
           <span style="font-size:11px;color:var(--subtle);">Uang Masuk Penagihan:</span>
           <strong style="font-size:16px;color:#4ADE80;">${rp(state.uangMasukPelunasan)}</strong>
         </div>
-        <input placeholder="Cari nama pedagang atau no. bon..." value="${state.ownerTagihSearch}" oninput="state.ownerTagihSearch=this.value;render()" style="background:#fff;margin-bottom:10px;" />
+        <input placeholder="Cari nama pembeli atau no. bon..." value="${state.ownerTagihSearch}" oninput="state.ownerTagihSearch=this.value;render()" style="background:#fff;margin-bottom:10px;" />
         ${belumBons.filter(({b}) => (b.pedagang + ' ' + b.id).toLowerCase().includes(state.ownerTagihSearch.toLowerCase())).map(({ b, i }) => {
           const sudah = Number(b.sudahBayar || 0);
           const sisaTagihan = Math.max(0, b.total - sudah);
